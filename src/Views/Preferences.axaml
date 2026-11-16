@@ -919,6 +919,12 @@
                              Text="{Binding ExtraArguments, Mode=TwoWay}"
                              IsVisible="{Binding IsCliBackend, Mode=OneWay}"/>
 
+                    <CheckBox Margin="0,8,0,0"
+                              Height="28"
+                              Content="{DynamicResource Text.Preferences.AI.PersistConversation}"
+                              IsChecked="{Binding PersistConversation, Mode=TwoWay}"
+                              IsVisible="{Binding IsCliBackend, Mode=OneWay}"/>
+
                     <TextBlock Margin="0,12,0,0" Text="{DynamicResource Text.Preferences.AI.Name}"/>
                     <TextBox Margin="0,4,0,0" CornerRadius="3" Height="28" Text="{Binding Name, Mode=TwoWay}"/>
 

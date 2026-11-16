@@ -65,8 +65,12 @@ namespace SourceGit.AI
 
             var stdout = ReadLinesAsync(process.StandardOutput, line =>
             {
-                // Streamed lines are progress only; the cleaned message is emitted
-                // after the process exits so fences and noise never leak through.
+                // With `--continue` codely prints a resume banner on stdout; it must
+                // never reach the commit message. Streamed lines are progress only,
+                // the cleaned message is emitted after the process exits.
+                if (line.StartsWith("resumed session ", StringComparison.Ordinal))
+                    return;
+
                 response.AppendLine(line);
                 onUpdate?.Invoke(line);
             }, timeout.Token);
@@ -103,7 +107,8 @@ namespace SourceGit.AI
         {
             var executable = string.IsNullOrWhiteSpace(_service.ExecutablePath) ? "codely" : _service.ExecutablePath.Trim();
             var extra = string.IsNullOrWhiteSpace(_service.ExtraArguments) ? string.Empty : " " + _service.ExtraArguments.Trim();
-            var arguments = "-p \"@" + promptFile + "\" --output-format text" + extra;
+            var continueArgument = _service.PersistConversation ? " --continue" : string.Empty;
+            var arguments = "-p \"@" + promptFile + "\" --output-format text" + continueArgument + extra;
             var extension = Path.GetExtension(executable).ToLowerInvariant();
 
             var startInfo = new ProcessStartInfo()

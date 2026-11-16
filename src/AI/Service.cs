@@ -129,6 +129,16 @@ namespace SourceGit.AI
             set;
         } = string.Empty;
 
+        /// <summary>
+        /// When enabled, consecutive generations in the same repository continue the
+        /// previous CLI conversation (<c>--continue</c>) instead of starting a new one.
+        /// </summary>
+        public bool PersistConversation
+        {
+            get;
+            set;
+        } = false;
+
         public OpenAIClient GetOpenAIClient()
         {
             if (string.IsNullOrEmpty(CachedApiKey))
