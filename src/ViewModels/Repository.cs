@@ -1664,6 +1664,32 @@ namespace SourceGit.ViewModels
             return all;
         }
 
+        public List<AI.Service> GetPreferredCliServices()
+        {
+            var services = Preferences.Instance.OpenAIServices;
+            if (services == null || services.Count == 0)
+                return [];
+
+            var all = new List<AI.Service>();
+            foreach (var service in services)
+            {
+                if (service.IsCliBackend)
+                    all.Add(service);
+            }
+
+            if (all.Count <= 1)
+                return all;
+
+            var preferred = _settings.PreferredOpenAIService;
+            foreach (var service in all)
+            {
+                if (service.Name.Equals(preferred, StringComparison.Ordinal))
+                    return [service];
+            }
+
+            return all;
+        }
+
         public async Task<bool> SaveCommitAsPatchAsync(Models.Commit commit, string folder, int index = 0)
         {
             var ignoredChars = new HashSet<char> { '/', '\\', ':', ',', '*', '?', '\"', '<', '>', '|', '`', '$', '^', '%', '[', ']', '+', '-' };

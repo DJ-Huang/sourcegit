@@ -679,6 +679,69 @@ namespace SourceGit.Views
             e.Handled = true;
         }
 
+        private void OnOpenCliHelper(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.WorkingCopy vm && sender is Button button && _showAdvancedOptions)
+            {
+                var repo = vm.Repository;
+
+                if (vm.Staged == null || vm.Staged.Count == 0)
+                {
+                    repo.SendNotification("No files added to commit!", true);
+                    e.Handled = true;
+                    return;
+                }
+
+                var services = repo.GetPreferredCliServices();
+                if (services.Count == 0)
+                {
+                    repo.SendNotification("No CLI AI service configured. Add one in Preferences and set its backend to 'cli'.", true);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (services.Count == 1)
+                {
+                    DoOpenCliAssistant(repo, services[0], vm.Staged);
+                    e.Handled = true;
+                    return;
+                }
+
+                var menu = new ContextMenu();
+                foreach (var service in services)
+                {
+                    var dup = service;
+                    var item = new MenuItem();
+                    item.Header = service.Name;
+                    item.Click += (_, ev) =>
+                    {
+                        DoOpenCliAssistant(repo, dup, vm.Staged);
+                        ev.Handled = true;
+                    };
+
+                    menu.Items.Add(item);
+                }
+
+                button.IsEnabled = false;
+                menu.Placement = PlacementMode.TopEdgeAlignedLeft;
+                menu.Closed += (_, _) => button.IsEnabled = true;
+                menu.Open(button);
+            }
+
+            e.Handled = true;
+        }
+
+        private void DoOpenCliAssistant(ViewModels.Repository repo, AI.Service service, List<Models.Change> changes)
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            if (owner == null)
+                return;
+
+            var assistant = new ViewModels.CliAssistant(repo, service, changes);
+            var view = new CliAssistant() { DataContext = assistant };
+            view.Show(owner);
+        }
+
         private void OnOpenConventionalCommitHelper(object _, RoutedEventArgs e)
         {
             var owner = TopLevel.GetTopLevel(this) as Window;

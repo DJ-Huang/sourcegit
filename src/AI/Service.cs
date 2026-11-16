@@ -12,6 +12,8 @@ namespace SourceGit.AI
 {
     public class Service : ObservableObject
     {
+        public static string[] Backends { get; } = [BackendOpenAI, BackendCli];
+
         public string Name
         {
             get => _name;
@@ -99,6 +101,34 @@ namespace SourceGit.AI
             set;
         } = string.Empty;
 
+        public string Backend
+        {
+            get => _backend;
+            set
+            {
+                if (SetProperty(ref _backend, value))
+                    OnPropertyChanged(nameof(IsCliBackend));
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsCliBackend
+        {
+            get => _backend.Equals(BackendCli, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public string ExecutablePath
+        {
+            get => _executablePath;
+            set => SetProperty(ref _executablePath, value);
+        }
+
+        public string ExtraArguments
+        {
+            get;
+            set;
+        } = string.Empty;
+
         public OpenAIClient GetOpenAIClient()
         {
             if (string.IsNullOrEmpty(CachedApiKey))
@@ -121,9 +151,14 @@ namespace SourceGit.AI
             return new OpenAIClient(credential, options);
         }
 
+        private const string BackendOpenAI = "openai";
+        private const string BackendCli = "cli";
+
         private string _name = string.Empty;
         private string _server = string.Empty;
         private string _model = string.Empty;
+        private string _backend = BackendOpenAI;
+        private string _executablePath = "codely";
         private string _reasoningEffortLevel = Options.IgnoredReasoningEffortLevel;
         private bool _autoFetchAvailableModels = true;
     }

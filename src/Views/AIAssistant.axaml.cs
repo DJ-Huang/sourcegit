@@ -98,7 +98,7 @@ namespace SourceGit.Views
 
         private void OnTextViewContextRequested(object sender, ContextRequestedEventArgs e)
         {
-            if (DataContext is not ViewModels.AIAssistant vm)
+            if (DataContext is not ViewModels.IAssistant vm)
                 return;
 
             var selected = SelectedText;

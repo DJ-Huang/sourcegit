@@ -468,6 +468,21 @@ namespace SourceGit.ViewModels
             set;
         } = [];
 
+        public string CommitMessageRule
+        {
+            get => _commitMessageRule;
+            set => SetProperty(ref _commitMessageRule, value);
+        }
+
+        public const string DefaultCommitMessageRule =
+@"Follow the Conventional Commits specification. Format: <type>(<scope>): <subject>
+Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+Write the subject in Chinese, at most 50 characters, without a trailing period
+If a body is needed, separate it with a blank line and keep each line under 72 characters
+Output only the commit message itself. Do not output explanations, code fences or Markdown markers";
+
+        private string _commitMessageRule = DefaultCommitMessageRule;
+
         public double LastCheckUpdateTime
         {
             get => _lastCheckUpdateTime;

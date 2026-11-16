@@ -422,6 +422,12 @@ namespace SourceGit.Views
             UpdateGitVersion();
         }
 
+        private void OnResetCommitMessageRule(object sender, RoutedEventArgs e)
+        {
+            ViewModels.Preferences.Instance.CommitMessageRule = ViewModels.Preferences.DefaultCommitMessageRule;
+            e.Handled = true;
+        }
+
         private void OnAddOpenAIService(object sender, RoutedEventArgs e)
         {
             var service = new AI.Service() { Name = "Unnamed Service" };
