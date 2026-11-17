@@ -147,8 +147,9 @@ namespace SourceGit.AI
         {
             var builder = new StringBuilder();
             builder.AppendLine("You are a git commit message generator.");
-            builder.AppendLine("Read the rules and the staged diff below, then output ONE commit message.");
-            builder.AppendLine("Output only the commit message itself. Do not explain, do not wrap it in code fences.");
+            builder.AppendLine("Read the rules and the staged diff below, then output ONE single-line commit subject.");
+            builder.AppendLine("Write exactly one line. Never add a body, a footer, bullet points or extra paragraphs.");
+            builder.AppendLine("Output only that line. Do not explain, do not wrap it in code fences.");
             builder.AppendLine();
 
             if (!string.IsNullOrWhiteSpace(rule))
@@ -254,6 +255,12 @@ namespace SourceGit.AI
 
             if (text.EndsWith("```", StringComparison.Ordinal))
                 text = text.Substring(0, text.Length - 3).TrimEnd();
+
+            // Commit messages are kept to a single subject line; drop any body the
+            // model may have produced despite the prompt constraint.
+            var firstBreak = text.IndexOf('\n');
+            if (firstBreak >= 0)
+                text = text.Substring(0, firstBreak);
 
             return text.Trim();
         }
