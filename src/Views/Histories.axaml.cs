@@ -869,6 +869,44 @@ namespace SourceGit.Views
                 vm.IsCollapseDetails = false;
         }
 
+        private void OpenMergeRequestAssistant(ViewModels.Repository repo)
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            if (owner == null)
+                return;
+
+            var sourceBranch = repo.CurrentBranch;
+            if (sourceBranch == null || sourceBranch.IsDetachedHead)
+            {
+                repo.SendNotification("Detached HEAD has no branch to create a merge request from.", true);
+                return;
+            }
+
+            var services = repo.GetPreferredCliServices();
+            if (services.Count == 0)
+            {
+                repo.SendNotification("No CLI AI service configured.", true);
+                return;
+            }
+
+            var targets = new List<string>();
+            foreach (var branch in repo.Branches)
+            {
+                if (!branch.Name.Equals(sourceBranch.Name, StringComparison.Ordinal))
+                    targets.Add(branch.Name);
+            }
+
+            if (targets.Count == 0)
+            {
+                repo.SendNotification("No other local branch is available as a merge request target.", true);
+                return;
+            }
+
+            var assistant = new ViewModels.MrAssistant(repo, services[0], sourceBranch.Name, targets);
+            var view = new MrAssistant() { DataContext = assistant };
+            view.Show(owner);
+        }
+
         private void OnOpenDetailsAsStandalone(object sender, RoutedEventArgs e)
         {
             if (DataContext is ViewModels.Histories vm)
@@ -1227,6 +1265,16 @@ namespace SourceGit.Views
                     e.Handled = true;
                 };
                 menu.Items.Add(revert);
+
+                var createMergeRequest = new MenuItem();
+                createMergeRequest.Header = App.Text("CommitCM.CreateMergeRequest");
+                createMergeRequest.Icon = this.CreateMenuIcon("Icons.CreatePR");
+                createMergeRequest.Click += (_, e) =>
+                {
+                    OpenMergeRequestAssistant(repo);
+                    e.Handled = true;
+                };
+                menu.Items.Add(createMergeRequest);
 
                 if (!isHead)
                 {

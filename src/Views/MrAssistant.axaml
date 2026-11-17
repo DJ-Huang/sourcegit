@@ -1,0 +1,147 @@
+<v:ChromelessWindow xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:v="using:SourceGit.Views"
+                    xmlns:vm="using:SourceGit.ViewModels"
+                    xmlns:models="using:SourceGit.Models"
+                    mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="560"
+                    x:Class="SourceGit.Views.MrAssistant"
+                    x:DataType="vm:MrAssistant"
+                    x:Name="ThisControl"
+                    Icon="/App.ico"
+                    Title="{DynamicResource Text.MrAssistant}"
+                    Width="640" Height="560"
+                    CanResize="True"
+                    WindowStartupLocation="CenterOwner">
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <!-- TitleBar -->
+    <Grid Grid.Row="0" Height="28" IsVisible="{Binding !#ThisControl.UseSystemWindowFrame}">
+      <Border Background="{DynamicResource Brush.TitleBar}"
+              BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border0}"
+              PointerPressed="BeginMoveWindow"/>
+
+      <Path Width="14" Height="14"
+            Margin="10,0,0,0"
+            HorizontalAlignment="Left"
+            Data="{StaticResource Icons.CreatePR}"
+            IsVisible="{OnPlatform True, macOS=False}"/>
+
+      <TextBlock Classes="bold"
+                 Text="{DynamicResource Text.MrAssistant}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                 IsHitTestVisible="False"/>
+
+      <v:CaptionButtons HorizontalAlignment="Right"
+                        IsCloseButtonOnly="True"
+                        IsVisible="{OnPlatform True, macOS=False}"/>
+    </Grid>
+
+    <!-- Form -->
+    <Grid Grid.Row="1" Margin="12,8,12,0" ColumnDefinitions="*,12,*">
+      <Grid Grid.Column="0" RowDefinitions="Auto,Auto">
+        <TextBlock Classes="group_header_label"
+                   Text="{DynamicResource Text.MrAssistant.Source}"/>
+        <TextBox Grid.Row="1"
+                 Height="28"
+                 Margin="0,4,0,0"
+                 CornerRadius="3"
+                 IsReadOnly="True"
+                 Text="{Binding SourceBranch, Mode=OneWay}"/>
+      </Grid>
+
+      <Grid Grid.Column="2" RowDefinitions="Auto,Auto">
+        <TextBlock Classes="group_header_label"
+                   Text="{DynamicResource Text.MrAssistant.Target}"/>
+        <ComboBox Grid.Row="1"
+                  Height="28"
+                  Margin="0,4,0,0"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding TargetBranches, Mode=OneWay}"
+                  SelectedItem="{Binding SelectedTarget, Mode=TwoWay}"/>
+      </Grid>
+    </Grid>
+
+    <!-- Content -->
+    <Grid Grid.Row="2" Margin="12,8,12,0" RowDefinitions="Auto,*">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
+        <TextBlock Grid.Column="0"
+                   Classes="group_header_label"
+                   VerticalAlignment="Center"
+                   Text="{DynamicResource Text.MrAssistant.Template}"/>
+        <ComboBox Grid.Column="1"
+                  Height="28"
+                  Margin="8,0,0,0"
+                  HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding Templates, Mode=OneWay}"
+                  SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="models:MrTemplate">
+              <TextBlock Text="{Binding Name}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </Grid>
+
+      <Grid Grid.Row="1" RowDefinitions="120,*">
+        <v:AIResponseView Grid.Row="0"
+                          Margin="0"
+                          BorderThickness="1"
+                          BorderBrush="{DynamicResource Brush.Border2}"
+                          Background="{DynamicResource Brush.Contents}"
+                          Content="{Binding Text}"/>
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*" Margin="0,8,0,0">
+          <TextBlock Classes="group_header_label"
+                     Text="{DynamicResource Text.MrAssistant.Title}"/>
+          <TextBox Grid.Row="1"
+                   Height="28"
+                   Margin="0,4,0,0"
+                   CornerRadius="3"
+                   Text="{Binding Title, Mode=TwoWay}"/>
+
+          <TextBlock Grid.Row="2"
+                     Classes="group_header_label"
+                     Margin="0,8,0,0"
+                     Text="{DynamicResource Text.MrAssistant.Description}"/>
+          <TextBox Grid.Row="3"
+                   Margin="0,4,0,0"
+                   CornerRadius="3"
+                   VerticalContentAlignment="Top"
+                   AcceptsReturn="True"
+                   TextWrapping="Wrap"
+                   Text="{Binding Description, Mode=TwoWay}"/>
+        </Grid>
+      </Grid>
+    </Grid>
+
+    <!-- Actions -->
+    <Grid Grid.Row="3" Margin="12,8,12,12" ColumnDefinitions="*,18,Auto,Auto">
+      <TextBlock Grid.Column="0"
+                 VerticalAlignment="Center"
+                 Classes="group_header_label"
+                 TextTrimming="CharacterEllipsis"
+                 Text="{Binding SourceBranch, Mode=OneWay}"/>
+
+      <v:LoadingIcon Grid.Column="1"
+                     Width="14" Height="14"
+                     IsVisible="{Binding IsGenerating}"/>
+
+      <Button Grid.Column="2"
+              Classes="flat"
+              Height="28"
+              Padding="12,0"
+              Content="{Binding GenerateLabel, Mode=OneWay}"
+              IsEnabled="{Binding !IsGenerating}"
+              Click="OnGenerateClicked"/>
+
+      <Button Grid.Column="3"
+              Classes="flat primary"
+              Height="28"
+              Margin="8,0,0,0" Padding="12,0"
+              Content="{DynamicResource Text.MrAssistant.Create}"
+              IsEnabled="{Binding CanCreate, Mode=OneWay}"
+              Click="OnCreateClicked"/>
+    </Grid>
+  </Grid>
+</v:ChromelessWindow>

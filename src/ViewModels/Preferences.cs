@@ -483,6 +483,21 @@ Output only the commit message itself. Do not output explanations, code fences o
 
         private string _commitMessageRule = DefaultCommitMessageRule;
 
+        public string GitLabApiUrl
+        {
+            get => _gitlabApiUrl;
+            set => SetProperty(ref _gitlabApiUrl, value);
+        }
+
+        public string GitLabToken
+        {
+            get => _gitlabToken;
+            set => SetProperty(ref _gitlabToken, value);
+        }
+
+        private string _gitlabApiUrl = string.Empty;
+        private string _gitlabToken = string.Empty;
+
         public double LastCheckUpdateTime
         {
             get => _lastCheckUpdateTime;

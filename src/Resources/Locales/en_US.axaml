@@ -163,6 +163,7 @@
   <x:String x:Key="Text.CommitCM.CherryPickMultiple" xml:space="preserve">Cherry-Pick...</x:String>
   <x:String x:Key="Text.CommitCM.CompareWithHead" xml:space="preserve">Compare with HEAD</x:String>
   <x:String x:Key="Text.CommitCM.CompareWithWorktree" xml:space="preserve">Compare with Worktree</x:String>
+  <x:String x:Key="Text.CommitCM.CreateMergeRequest" xml:space="preserve">Create Merge Request with codely...</x:String>
   <x:String x:Key="Text.CommitCM.CopyAuthor" xml:space="preserve">Author</x:String>
   <x:String x:Key="Text.CommitCM.CopyAuthorTime" xml:space="preserve">Author Time</x:String>
   <x:String x:Key="Text.CommitCM.CopyCommitMessage" xml:space="preserve">Message</x:String>
@@ -607,6 +608,13 @@
   <x:String x:Key="Text.Launcher.Pages" xml:space="preserve">Tabs</x:String>
   <x:String x:Key="Text.Launcher.Workspaces" xml:space="preserve">Workspaces</x:String>
   <x:String x:Key="Text.Merge" xml:space="preserve">Merge Branch</x:String>
+  <x:String x:Key="Text.MrAssistant" xml:space="preserve">Create Merge Request</x:String>
+  <x:String x:Key="Text.MrAssistant.Create" xml:space="preserve">CREATE</x:String>
+  <x:String x:Key="Text.MrAssistant.Description" xml:space="preserve">DESCRIPTION</x:String>
+  <x:String x:Key="Text.MrAssistant.Source" xml:space="preserve">SOURCE</x:String>
+  <x:String x:Key="Text.MrAssistant.Target" xml:space="preserve">TARGET</x:String>
+  <x:String x:Key="Text.MrAssistant.Template" xml:space="preserve">TEMPLATE</x:String>
+  <x:String x:Key="Text.MrAssistant.Title" xml:space="preserve">TITLE</x:String>
   <x:String x:Key="Text.Merge.Edit" xml:space="preserve">Customize merge message</x:String>
   <x:String x:Key="Text.Merge.Into" xml:space="preserve">Into:</x:String>
   <x:String x:Key="Text.Merge.Mode" xml:space="preserve">Merge Option:</x:String>
@@ -677,6 +685,9 @@
   <x:String x:Key="Text.Period.Yesterday" xml:space="preserve">Yesterday</x:String>
   <x:String x:Key="Text.Preferences" xml:space="preserve">Preferences</x:String>
   <x:String x:Key="Text.Preferences.AI" xml:space="preserve">AI</x:String>
+  <x:String x:Key="Text.Preferences.GitLab" xml:space="preserve">GitLab</x:String>
+  <x:String x:Key="Text.Preferences.GitLab.ApiUrl" xml:space="preserve">API URL</x:String>
+  <x:String x:Key="Text.Preferences.GitLab.Token" xml:space="preserve">Access Token</x:String>
   <x:String x:Key="Text.Preferences.AI.AdditionalPrompt" xml:space="preserve">Additional Prompt (Use `-` to list your requirements)</x:String>
   <x:String x:Key="Text.Preferences.AI.ApiKey" xml:space="preserve">API Key</x:String>
   <x:String x:Key="Text.Preferences.AI.Backend" xml:space="preserve">Backend</x:String>

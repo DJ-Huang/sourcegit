@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 namespace SourceGit.AI
 {
     /// <summary>
-    /// Generates commit messages by invoking an external CLI (codely) in headless mode.
-    /// The prompt, rules and staged diff are written to a temporary file and referenced
-    /// with the <c>@path</c> syntax, which keeps the command line short, ASCII-only and
-    /// free of shell quoting or codepage hazards.
+    /// Runs an external CLI (codely) in headless mode. The prompt is written to a
+    /// temporary file and referenced with the <c>@path</c> syntax, which keeps the
+    /// command line short, ASCII-only and free of shell quoting or codepage hazards.
     /// </summary>
     public class CliAgent
     {
@@ -29,13 +28,31 @@ namespace SourceGit.AI
             Action<string> onUpdate,
             CancellationToken cancellation)
         {
+            var prompt = BuildCommitPrompt(currentBranch, changeList, stagedDiff, rule);
+            var text = await RunPromptAsync(repo, prompt, onUpdate, cancellation).ConfigureAwait(false);
+            var line = FirstLine(text);
+
+            onUpdate?.Invoke(string.Empty);
+            onUpdate?.Invoke("# Assistant");
+            onUpdate?.Invoke(line);
+            onUpdate?.Invoke(string.Empty);
+        }
+
+        /// <summary>
+        /// Runs the configured CLI with a fully caller-built prompt and returns the
+        /// cleaned output. The result may span multiple lines.
+        /// </summary>
+        public async Task<string> RunPromptAsync(
+            string repo,
+            string prompt,
+            Action<string> onUpdate,
+            CancellationToken cancellation)
+        {
             var promptFile = Path.Combine(Path.GetTempPath(), "sourcegit-codely-" + Guid.NewGuid().ToString("N") + ".txt");
             try
             {
-                var prompt = BuildPrompt(currentBranch, changeList, stagedDiff, rule);
                 await File.WriteAllTextAsync(promptFile, prompt, new UTF8Encoding(false), cancellation).ConfigureAwait(false);
-
-                await RunAsync(repo, promptFile, onUpdate, cancellation).ConfigureAwait(false);
+                return await RunAsync(repo, promptFile, onUpdate, cancellation).ConfigureAwait(false);
             }
             finally
             {
@@ -43,7 +60,7 @@ namespace SourceGit.AI
             }
         }
 
-        private async Task RunAsync(string repo, string promptFile, Action<string> onUpdate, CancellationToken cancellation)
+        private async Task<string> RunAsync(string repo, string promptFile, Action<string> onUpdate, CancellationToken cancellation)
         {
             using var process = new Process() { StartInfo = CreateStartInfo(repo, promptFile) };
 
@@ -66,8 +83,7 @@ namespace SourceGit.AI
             var stdout = ReadLinesAsync(process.StandardOutput, line =>
             {
                 // With `--continue` codely prints a resume banner on stdout; it must
-                // never reach the commit message. Streamed lines are progress only,
-                // the cleaned message is emitted after the process exits.
+                // never reach the result.
                 if (line.StartsWith("resumed session ", StringComparison.Ordinal))
                     return;
 
@@ -95,12 +111,7 @@ namespace SourceGit.AI
             if (string.IsNullOrEmpty(text))
                 throw new Exception("codely returned no content." + FormatErrors(errors.ToString()));
 
-            // Overwrite the streamed raw lines with the cleaned message so that
-            // markdown fences or trailing noise never reach the commit input box.
-            onUpdate?.Invoke(string.Empty);
-            onUpdate?.Invoke("# Assistant");
-            onUpdate?.Invoke(text);
-            onUpdate?.Invoke(string.Empty);
+            return text;
         }
 
         private ProcessStartInfo CreateStartInfo(string repo, string promptFile)
@@ -143,7 +154,7 @@ namespace SourceGit.AI
             return startInfo;
         }
 
-        private string BuildPrompt(string currentBranch, string changeList, string stagedDiff, string rule)
+        private string BuildCommitPrompt(string currentBranch, string changeList, string stagedDiff, string rule)
         {
             var builder = new StringBuilder();
             builder.AppendLine("You are a git commit message generator.");
@@ -191,6 +202,15 @@ namespace SourceGit.AI
             }
 
             return builder.ToString();
+        }
+
+        private static string FirstLine(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
+            var index = text.IndexOf('\n');
+            return (index >= 0 ? text.Substring(0, index) : text).Trim();
         }
 
         private static async Task ReadLinesAsync(StreamReader reader, Action<string> onLine, CancellationToken cancellation)
@@ -255,12 +275,6 @@ namespace SourceGit.AI
 
             if (text.EndsWith("```", StringComparison.Ordinal))
                 text = text.Substring(0, text.Length - 3).TrimEnd();
-
-            // Commit messages are kept to a single subject line; drop any body the
-            // model may have produced despite the prompt constraint.
-            var firstBreak = text.IndexOf('\n');
-            if (firstBreak >= 0)
-                text = text.Substring(0, firstBreak);
 
             return text.Trim();
         }
