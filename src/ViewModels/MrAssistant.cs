@@ -106,6 +106,12 @@ namespace SourceGit.ViewModels
             TargetBranches = targetBranches;
             _selectedTarget = FindTarget(targetBranches, Preferences.Instance.MrLastTarget) ?? PickDefaultTarget(targetBranches);
             _selectedTemplate = FindTemplate(Preferences.Instance.MrLastTemplate) ?? Models.MrTemplate.All[0];
+
+            // Persist the effective defaults so the very first open is remembered even
+            // when the user never touches the selectors.
+            Preferences.Instance.MrLastTarget = _selectedTarget ?? string.Empty;
+            Preferences.Instance.MrLastTemplate = _selectedTemplate?.Name ?? string.Empty;
+
             _text = "Select a target branch and a template, then click GENERATE.";
         }
 

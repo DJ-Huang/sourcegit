@@ -681,7 +681,7 @@ namespace SourceGit.Views
 
         private void OnOpenCliHelper(object sender, RoutedEventArgs e)
         {
-            if (DataContext is ViewModels.WorkingCopy vm && sender is Button button && _showAdvancedOptions)
+            if (DataContext is ViewModels.WorkingCopy vm && sender is Button button)
             {
                 var repo = vm.Repository;
 
@@ -740,6 +740,7 @@ namespace SourceGit.Views
             var assistant = new ViewModels.CliAssistant(repo, service, changes);
             var view = new CliAssistant() { DataContext = assistant };
             view.Show(owner);
+            view.Activate();
         }
 
         private void OnOpenConventionalCommitHelper(object _, RoutedEventArgs e)
@@ -772,6 +773,7 @@ namespace SourceGit.Views
             var assistant = new ViewModels.AIAssistant(repo, service, changes);
             var view = new AIAssistant() { DataContext = assistant };
             view.Show(owner);
+            view.Activate();
         }
 
         private string _commitMessage = string.Empty;

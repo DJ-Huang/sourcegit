@@ -911,6 +911,7 @@ namespace SourceGit.Views
             var assistant = new ViewModels.MrAssistant(repo, services[0], sourceBranch.Name, targets);
             var view = new MrAssistant() { DataContext = assistant };
             view.Show(owner);
+            view.Activate();
         }
 
         private void OnOpenDetailsAsStandalone(object sender, RoutedEventArgs e)

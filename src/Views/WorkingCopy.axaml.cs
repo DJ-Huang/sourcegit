@@ -1410,15 +1410,24 @@ namespace SourceGit.Views
             menu.Items.Add(new MenuItem() { Header = "-" });
         }
 
-        private void DoOpenAIAssistant(ViewModels.Repository repo, AI.Service serivce, List<Models.Change> changes)
+        private void DoOpenAIAssistant(ViewModels.Repository repo, AI.Service service, List<Models.Change> changes)
         {
             var owner = TopLevel.GetTopLevel(this) as Window;
             if (owner == null)
                 return;
 
-            var assistant = new ViewModels.AIAssistant(repo, serivce, changes);
+            if (service.IsCliBackend)
+            {
+                var cli = new CliAssistant() { DataContext = new ViewModels.CliAssistant(repo, service, changes) };
+                cli.Show(owner);
+                cli.Activate();
+                return;
+            }
+
+            var assistant = new ViewModels.AIAssistant(repo, service, changes);
             var view = new AIAssistant() { DataContext = assistant };
             view.Show(owner);
+            view.Activate();
         }
     }
 }
