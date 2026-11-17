@@ -181,12 +181,16 @@ namespace SourceGit.ViewModels
             IsCreating = true;
             try
             {
-                var (apiBase, token, projectPath, error) = ResolveCredential();
+                var (apiBase, token, projectPath, remote, error) = ResolveCredential();
                 if (!string.IsNullOrEmpty(error))
                     return new Commands.CreateMergeRequest.Result() { Error = error };
 
+                var pushError = await EnsureSourceBranchPushedAsync(remote).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(pushError))
+                    return new Commands.CreateMergeRequest.Result() { Error = pushError };
+
                 var client = new Commands.CreateMergeRequest(apiBase, token, projectPath);
-                return await client.CreateAsync(SourceBranch, target, title, description, false, _cancel.Token);
+                return await client.CreateAsync(SourceBranch, target, title, description, false, _cancel.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -196,6 +200,49 @@ namespace SourceGit.ViewModels
             {
                 IsCreating = false;
             }
+        }
+
+        /// <summary>
+        /// The merge request API only accepts a source branch that already exists on the
+        /// server, so the branch is pushed first when it is missing or behind. Only a
+        /// regular push is attempted: a rejected non-fast-forward surfaces the git error
+        /// instead of silently overwriting the remote branch.
+        /// </summary>
+        private async Task<string> EnsureSourceBranchPushedAsync(Models.Remote remote)
+        {
+            AppendLine($"Checking '{SourceBranch}' on '{remote.Name}'...");
+
+            var lookup = await new Commands.GetRemoteBranchTip(_repo.FullPath, remote.Name, SourceBranch).ReadAsync().ConfigureAwait(false);
+            if (!lookup.IsSuccess)
+                return $"Failed to read '{SourceBranch}' from '{remote.Name}': {lookup.Error}";
+
+            var local = await new Commands.QueryRevisionByRefName(_repo.FullPath, $"refs/heads/{SourceBranch}".Quoted())
+                .GetResultAsync()
+                .ConfigureAwait(false);
+            if (string.IsNullOrEmpty(local))
+                return $"Local branch '{SourceBranch}' does not exist.";
+
+            if (lookup.Tip == local)
+            {
+                AppendLine($"'{SourceBranch}' is up to date on '{remote.Name}'.");
+                return string.Empty;
+            }
+
+            AppendLine(string.IsNullOrEmpty(lookup.Tip)
+                ? $"Pushing '{SourceBranch}' to '{remote.Name}'..."
+                : $"'{remote.Name}' is at a different commit for '{SourceBranch}', pushing the local branch...");
+
+            var push = new Commands.PushBranch(_repo.FullPath, remote.Name, SourceBranch, remote.PrivateSSHKey);
+            if (!await push.RunAsync().ConfigureAwait(false))
+                return $"Failed to push '{SourceBranch}' to '{remote.Name}'. Resolve the git error above and try again.";
+
+            AppendLine($"'{SourceBranch}' is now available on '{remote.Name}'.");
+            return string.Empty;
+        }
+
+        private void AppendLine(string line)
+        {
+            Text = string.IsNullOrEmpty(Text) ? line : Text + Environment.NewLine + line;
         }
 
         private static string FindTarget(List<string> branches, string name)
@@ -326,10 +373,10 @@ namespace SourceGit.ViewModels
             return (title, description);
         }
 
-        private (string ApiBase, string Token, string ProjectPath, string Error) ResolveCredential()
+        private (string ApiBase, string Token, string ProjectPath, Models.Remote Remote, string Error) ResolveCredential()
         {
             if (_repo.Remotes.Count == 0)
-                return (string.Empty, string.Empty, string.Empty, "No remote is configured for this repository.");
+                return (string.Empty, string.Empty, string.Empty, null, "No remote is configured for this repository.");
 
             Models.Remote remote = null;
             foreach (var r in _repo.Remotes)
@@ -344,7 +391,7 @@ namespace SourceGit.ViewModels
             }
 
             if (remote == null || !remote.TryGetVisitURL(out var webUrl))
-                return (string.Empty, string.Empty, string.Empty, "Failed to resolve the project URL from the remote.");
+                return (string.Empty, string.Empty, string.Empty, null, "Failed to resolve the project URL from the remote.");
 
             var uri = new Uri(webUrl);
             var projectPath = uri.AbsolutePath.Trim('/');
@@ -366,10 +413,10 @@ namespace SourceGit.ViewModels
                 apiBase = $"{uri.Scheme}://{uri.Authority}/api/v4";
 
             if (string.IsNullOrWhiteSpace(token))
-                return (string.Empty, string.Empty, string.Empty,
+                return (string.Empty, string.Empty, string.Empty, null,
                     "No GitLab token found. Configure it in Preferences, or set GITLAB_TOKEN in ~/.config/gitlab-skill/.env.");
 
-            return (apiBase, token, projectPath, string.Empty);
+            return (apiBase, token, projectPath, remote, string.Empty);
         }
 
         private static (string Api, string Token) ReadGitLabSkillEnv()
