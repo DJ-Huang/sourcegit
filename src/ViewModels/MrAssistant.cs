@@ -22,7 +22,10 @@ namespace SourceGit.ViewModels
             set
             {
                 if (SetProperty(ref _selectedTarget, value))
+                {
+                    Preferences.Instance.MrLastTarget = value ?? string.Empty;
                     OnPropertyChanged(nameof(CanCreate));
+                }
             }
         }
 
@@ -31,7 +34,11 @@ namespace SourceGit.ViewModels
         public Models.MrTemplate SelectedTemplate
         {
             get => _selectedTemplate;
-            set => SetProperty(ref _selectedTemplate, value);
+            set
+            {
+                if (SetProperty(ref _selectedTemplate, value))
+                    Preferences.Instance.MrLastTemplate = value?.Name ?? string.Empty;
+            }
         }
 
         public string Title
@@ -95,9 +102,10 @@ namespace SourceGit.ViewModels
             _cancel = new CancellationTokenSource();
 
             SourceBranch = sourceBranch;
+            SortTargets(targetBranches);
             TargetBranches = targetBranches;
-            _selectedTarget = targetBranches.Count > 0 ? targetBranches[0] : string.Empty;
-            _selectedTemplate = Models.MrTemplate.All[0];
+            _selectedTarget = FindTarget(targetBranches, Preferences.Instance.MrLastTarget) ?? PickDefaultTarget(targetBranches);
+            _selectedTemplate = FindTemplate(Preferences.Instance.MrLastTemplate) ?? Models.MrTemplate.All[0];
             _text = "Select a target branch and a template, then click GENERATE.";
         }
 
@@ -183,6 +191,77 @@ namespace SourceGit.ViewModels
                 IsCreating = false;
             }
         }
+
+        private static string FindTarget(List<string> branches, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
+            foreach (var branch in branches)
+            {
+                if (branch.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    return branch;
+            }
+
+            return null;
+        }
+
+        private static Models.MrTemplate FindTemplate(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
+
+            foreach (var template in Models.MrTemplate.All)
+            {
+                if (template.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    return template;
+            }
+
+            return null;
+        }
+
+        private static void SortTargets(List<string> branches)
+        {
+            branches.Sort((a, b) =>
+            {
+                var rankA = RankTarget(a);
+                var rankB = RankTarget(b);
+                if (rankA != rankB)
+                    return rankA.CompareTo(rankB);
+
+                return string.Compare(a, b, StringComparison.OrdinalIgnoreCase);
+            });
+        }
+
+        private static string PickDefaultTarget(List<string> branches)
+        {
+            if (branches.Count == 0)
+                return string.Empty;
+
+            foreach (var name in DefaultTargetNames)
+            {
+                foreach (var branch in branches)
+                {
+                    if (branch.Equals(name, StringComparison.OrdinalIgnoreCase))
+                        return branch;
+                }
+            }
+
+            return branches[0];
+        }
+
+        private static int RankTarget(string branch)
+        {
+            for (var i = 0; i < DefaultTargetNames.Length; i++)
+            {
+                if (branch.Equals(DefaultTargetNames[i], StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+
+            return DefaultTargetNames.Length;
+        }
+
+        private static readonly string[] DefaultTargetNames = ["main", "master", "develop", "trunk"];
 
         public void Cancel()
         {

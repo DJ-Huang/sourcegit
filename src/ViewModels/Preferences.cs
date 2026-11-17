@@ -498,6 +498,21 @@ Output only the commit message itself. Do not output explanations, code fences o
         private string _gitlabApiUrl = string.Empty;
         private string _gitlabToken = string.Empty;
 
+        public string MrLastTarget
+        {
+            get => _mrLastTarget;
+            set => SetProperty(ref _mrLastTarget, value);
+        }
+
+        public string MrLastTemplate
+        {
+            get => _mrLastTemplate;
+            set => SetProperty(ref _mrLastTemplate, value);
+        }
+
+        private string _mrLastTarget = string.Empty;
+        private string _mrLastTemplate = string.Empty;
+
         public double LastCheckUpdateTime
         {
             get => _lastCheckUpdateTime;

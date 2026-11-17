@@ -890,9 +890,15 @@ namespace SourceGit.Views
             }
 
             var targets = new List<string>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
             foreach (var branch in repo.Branches)
             {
-                if (!branch.Name.Equals(sourceBranch.Name, StringComparison.Ordinal))
+                if (branch.Name.Equals(sourceBranch.Name, StringComparison.Ordinal))
+                    continue;
+
+                // Branches mixes local and remote-tracking entries; the same name can
+                // appear twice, so keep the first occurrence only.
+                if (seen.Add(branch.Name))
                     targets.Add(branch.Name);
             }
 
