@@ -4,13 +4,13 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:v="using:SourceGit.Views"
                     xmlns:vm="using:SourceGit.ViewModels"
-                    mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="400"
+                    mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="440"
                     x:Class="SourceGit.Views.CliAssistant"
                     x:DataType="vm:CliAssistant"
                     x:Name="ThisControl"
                     Icon="/App.ico"
                     Title="{DynamicResource Text.AIAssistant}"
-                    Width="520" Height="400"
+                    Width="560" Height="440"
                     CanResize="True"
                     WindowStartupLocation="CenterOwner">
   <Grid RowDefinitions="Auto,*,Auto">
@@ -45,32 +45,55 @@
                       Content="{Binding Text}"/>
 
     <!-- Options -->
-    <Grid Grid.Row="2" Margin="8,0,8,8" ColumnDefinitions="*,18,Auto,Auto">
-      <TextBlock Grid.Column="0"
-                 Classes="group_header_label"
-                 VerticalAlignment="Center"
-                 TextTrimming="CharacterEllipsis"
-                 Text="{Binding CommandText, Mode=OneWay}"/>
+    <Grid Grid.Row="2" Margin="8,0,8,8" RowDefinitions="Auto,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
+        <TextBlock Grid.Column="0"
+                   Classes="group_header_label"
+                   VerticalAlignment="Center"
+                   Text="{DynamicResource Text.AIAssistant.BranchName}"/>
 
-      <v:LoadingIcon Grid.Column="1"
-                     Width="14" Height="14"
-                     IsVisible="{Binding IsGenerating}"/>
+        <TextBox Grid.Column="1"
+                 Height="26"
+                 Margin="6,0,0,0"
+                 CornerRadius="3"
+                 Text="{Binding BranchName, Mode=TwoWay}"/>
+      </Grid>
 
-      <Button Grid.Column="2"
-              Classes="flat primary"
-              Height="28"
-              Margin="8,0" Padding="12,0"
-              Content="{DynamicResource Text.AIAssistant.Use}"
-              IsEnabled="{Binding Response, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-              Click="OnUseClicked"/>
+      <Grid Grid.Row="1" ColumnDefinitions="*,18,Auto,Auto,Auto">
+        <TextBlock Grid.Column="0"
+                   Classes="group_header_label"
+                   VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis"
+                   Text="{Binding CommandText, Mode=OneWay}"/>
 
-      <Button Grid.Column="3"
-              Classes="flat"
-              Height="28"
-              Padding="12,0"
-              Content="{DynamicResource Text.AIAssistant.Regen}"
-              IsEnabled="{Binding !IsGenerating}"
-              Click="OnRegenClicked"/>
+        <v:LoadingIcon Grid.Column="1"
+                       Width="14" Height="14"
+                       IsVisible="{Binding IsGenerating}"/>
+
+        <Button Grid.Column="2"
+                Classes="flat"
+                Height="28"
+                Margin="8,0" Padding="12,0"
+                Content="{Binding GenerateLabel, Mode=OneWay}"
+                IsEnabled="{Binding !IsGenerating}"
+                Click="OnGenerateClicked"/>
+
+        <Button Grid.Column="3"
+                Classes="flat"
+                Height="28"
+                Padding="12,0"
+                Content="{DynamicResource Text.AIAssistant.Use}"
+                IsEnabled="{Binding Response, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Click="OnUseClicked"/>
+
+        <Button Grid.Column="4"
+                Classes="flat primary"
+                Height="28"
+                Margin="8,0,0,0" Padding="12,0"
+                Content="{DynamicResource Text.AIAssistant.CreateBranchAndCommit}"
+                IsEnabled="{Binding CanCreateBranch, Mode=OneWay}"
+                Click="OnCreateBranchAndCommitClicked"/>
+      </Grid>
     </Grid>
   </Grid>
 </v:ChromelessWindow>
