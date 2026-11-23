@@ -72,7 +72,7 @@ namespace SourceGit.Views
 
         private void DrawCurves(DrawingContext context, Models.CommitGraph graph, double top, double bottom, double rowHeight)
         {
-            var grayedPen = new Pen(new SolidColorBrush(Colors.Gray, 0.4), Models.CommitGraph.Pens[0].Thickness);
+            var grayedPen = new Pen(new SolidColorBrush(Colors.Gray, 0.4), Models.CommitGraph.GetPen(0).Thickness);
 
             foreach (var link in graph.Links)
             {
@@ -91,7 +91,7 @@ namespace SourceGit.Views
                     ctx.QuadraticBezierTo(new Point(link.Control.X, link.Control.Y * rowHeight), new Point(link.End.X, endY));
                 }
 
-                var pen = link.IsHighlighted ? Models.CommitGraph.Pens[link.Color] : grayedPen;
+                var pen = link.IsHighlighted ? Models.CommitGraph.GetPen(link.Color) : grayedPen;
                 context.DrawGeometry(null, pen, geo);
             }
 
@@ -107,7 +107,7 @@ namespace SourceGit.Views
                     break;
 
                 var geo = new StreamGeometry();
-                var pen = line.IsHighlighted ? Models.CommitGraph.Pens[line.Color] : grayedPen;
+                var pen = line.IsHighlighted ? Models.CommitGraph.GetPen(line.Color) : grayedPen;
 
                 using (var ctx = geo.Open())
                 {
@@ -169,7 +169,7 @@ namespace SourceGit.Views
         {
             var dotFill = DotBrush;
             var dotFillPen = new Pen(dotFill, 2);
-            var grayedPen = new Pen(Brushes.Gray, Models.CommitGraph.Pens[0].Thickness);
+            var grayedPen = new Pen(Brushes.Gray, Models.CommitGraph.GetPen(0).Thickness);
 
             foreach (var dot in graph.Dots)
             {
@@ -180,7 +180,7 @@ namespace SourceGit.Views
                 if (center.Y > bottom)
                     break;
 
-                var pen = dot.IsHighlighted ? Models.CommitGraph.Pens[dot.Color] : grayedPen;
+                var pen = dot.IsHighlighted ? Models.CommitGraph.GetPen(dot.Color) : grayedPen;
                 switch (dot.Type)
                 {
                     case Models.CommitGraph.DotType.Head:
