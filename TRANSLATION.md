@@ -6,7 +6,7 @@ This document shows the translation status of each locale file in the repository
 
 ### ![en_US](https://img.shields.io/badge/en__US-%E2%88%9A-brightgreen)
 
-### ![ca__ES](https://img.shields.io/badge/ca__ES-98.44%25-yellow)
+### ![ca__ES](https://img.shields.io/badge/ca__ES-98.26%25-yellow)
 
 <details>
 <summary>Missing keys in ca_ES.axaml</summary>
@@ -22,6 +22,8 @@ This document shows the translation status of each locale file in the repository
 - Text.EditApiKey.InvalidStorage
 - Text.EditApiKey.Server
 - Text.EditApiKey.Storage
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.InProgress.Am
 - Text.Preferences.General.CheckRepositoryStatusOnWelcome
 - Text.Repository.FocusOnCurrentBranch
@@ -31,7 +33,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![de__DE](https://img.shields.io/badge/de__DE-92.38%25-yellow)
+### ![de__DE](https://img.shields.io/badge/de__DE-92.21%25-yellow)
 
 <details>
 <summary>Missing keys in de_DE.axaml</summary>
@@ -64,6 +66,8 @@ This document shows the translation status of each locale file in the repository
 - Text.File.Binary
 - Text.File.HexViewer
 - Text.File.HexViewer.GotoAddress
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph.SelectedCommitsOnlyFirstParent
 - Text.Hotkeys.Repo.ToggleCommitDetailPanel
@@ -122,7 +126,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![el__GR](https://img.shields.io/badge/el__GR-91.92%25-yellow)
+### ![el__GR](https://img.shields.io/badge/el__GR-91.75%25-yellow)
 
 <details>
 <summary>Missing keys in el_GR.axaml</summary>
@@ -155,6 +159,8 @@ This document shows the translation status of each locale file in the repository
 - Text.File.Binary
 - Text.File.HexViewer
 - Text.File.HexViewer.GotoAddress
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph.SelectedCommitsOnlyFirstParent
 - Text.Hotkeys.Repo.ToggleCommitDetailPanel
@@ -218,13 +224,15 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![es__ES](https://img.shields.io/badge/es__ES-99.45%25-yellow)
+### ![es__ES](https://img.shields.io/badge/es__ES-99.27%25-yellow)
 
 <details>
 <summary>Missing keys in es_ES.axaml</summary>
 
 - Text.BranchCM.Pin
 - Text.BranchCM.Unpin
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Preferences.General.CheckRepositoryStatusOnWelcome
 - Text.Repository.PinnedBranches
 - Text.Welcome.RefreshStatus
@@ -232,7 +240,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![fr__FR](https://img.shields.io/badge/fr__FR-88.25%25-yellow)
+### ![fr__FR](https://img.shields.io/badge/fr__FR-88.08%25-yellow)
 
 <details>
 <summary>Missing keys in fr_FR.axaml</summary>
@@ -292,6 +300,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.FinishWithRebase
 - Text.GitFlow.StartAt
 - Text.GitFlow.StartName
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph.SelectedCommitsOnlyFirstParent
 - Text.Hotkeys.Repo.ToggleCommitDetailPanel
@@ -368,7 +378,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![he__IL](https://img.shields.io/badge/he__IL-88.25%25-yellow)
+### ![he__IL](https://img.shields.io/badge/he__IL-88.08%25-yellow)
 
 <details>
 <summary>Missing keys in he_IL.axaml</summary>
@@ -428,6 +438,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.FinishWithRebase
 - Text.GitFlow.StartAt
 - Text.GitFlow.StartName
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph.SelectedCommitsOnlyFirstParent
 - Text.Hotkeys.Repo.ToggleCommitDetailPanel
@@ -504,7 +516,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![id__ID](https://img.shields.io/badge/id__ID-92.38%25-yellow)
+### ![id__ID](https://img.shields.io/badge/id__ID-92.21%25-yellow)
 
 <details>
 <summary>Missing keys in id_ID.axaml</summary>
@@ -537,6 +549,8 @@ This document shows the translation status of each locale file in the repository
 - Text.File.Binary
 - Text.File.HexViewer
 - Text.File.HexViewer.GotoAddress
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph.SelectedCommitsOnlyFirstParent
 - Text.Hotkeys.Repo.ToggleCommitDetailPanel
@@ -595,7 +609,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![it__IT](https://img.shields.io/badge/it__IT-82.37%25-yellow)
+### ![it__IT](https://img.shields.io/badge/it__IT-82.22%25-yellow)
 
 <details>
 <summary>Missing keys in it_IT.axaml</summary>
@@ -681,6 +695,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.FinishWithRebase
 - Text.GitFlow.StartAt
 - Text.GitFlow.StartName
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.GotoRevisionSelector
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph
@@ -795,7 +811,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![ja__JP](https://img.shields.io/badge/ja__JP-96.33%25-yellow)
+### ![ja__JP](https://img.shields.io/badge/ja__JP-96.15%25-yellow)
 
 <details>
 <summary>Missing keys in ja_JP.axaml</summary>
@@ -821,6 +837,8 @@ This document shows the translation status of each locale file in the repository
 - Text.EditApiKey.InvalidStorage
 - Text.EditApiKey.Server
 - Text.EditApiKey.Storage
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.InProgress.Am
 - Text.Preferences.General.CheckRepositoryStatusOnWelcome
 - Text.Preferences.Shell.Args.ToolTip
@@ -843,7 +861,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![ko__KR](https://img.shields.io/badge/ko__KR-89.62%25-yellow)
+### ![ko__KR](https://img.shields.io/badge/ko__KR-89.46%25-yellow)
 
 <details>
 <summary>Missing keys in ko_KR.axaml</summary>
@@ -897,6 +915,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.FinishWithRebase
 - Text.GitFlow.StartAt
 - Text.GitFlow.StartName
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph.SelectedCommitsOnlyFirstParent
 - Text.Hotkeys.Repo.ToggleCommitDetailPanel
@@ -964,7 +984,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![pt__BR](https://img.shields.io/badge/pt__BR-58.13%25-red)
+### ![pt__BR](https://img.shields.io/badge/pt__BR-58.02%25-red)
 
 <details>
 <summary>Missing keys in pt_BR.axaml</summary>
@@ -1159,6 +1179,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.StartName
 - Text.GitLFS.Locks.UnlockAllMyLocks
 - Text.GitLFS.Locks.UnlockAllMyLocks.Confirm
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.GotoRevisionSelector
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph
@@ -1428,18 +1450,20 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![ru__RU](https://img.shields.io/badge/ru__RU-99.72%25-yellow)
+### ![ru__RU](https://img.shields.io/badge/ru__RU-99.54%25-yellow)
 
 <details>
 <summary>Missing keys in ru_RU.axaml</summary>
 
 - Text.BranchCM.Pin
 - Text.BranchCM.Unpin
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.Repository.PinnedBranches
 
 </details>
 
-### ![ta__IN](https://img.shields.io/badge/ta__IN-59.69%25-red)
+### ![ta__IN](https://img.shields.io/badge/ta__IN-59.58%25-red)
 
 <details>
 <summary>Missing keys in ta_IN.axaml</summary>
@@ -1649,6 +1673,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.StartName
 - Text.GitLFS.Locks.UnlockAllMyLocks
 - Text.GitLFS.Locks.UnlockAllMyLocks.Confirm
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.GotoRevisionSelector
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph
@@ -1886,7 +1912,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![uk__UA](https://img.shields.io/badge/uk__UA-60.42%25-red)
+### ![uk__UA](https://img.shields.io/badge/uk__UA-60.31%25-red)
 
 <details>
 <summary>Missing keys in uk_UA.axaml</summary>
@@ -2092,6 +2118,8 @@ This document shows the translation status of each locale file in the repository
 - Text.GitFlow.StartName
 - Text.GitLFS.Locks.UnlockAllMyLocks
 - Text.GitLFS.Locks.UnlockAllMyLocks.Confirm
+- Text.GotoLine
+- Text.GotoLine.Range
 - Text.GotoRevisionSelector
 - Text.Histories.AdvancedOptions
 - Text.Histories.HighlightsInGraph
