@@ -14,8 +14,10 @@
   <x:String x:Key="Text.AddWorktree.Name.Placeholder" xml:space="preserve">Optional. Default is the destination folder name.</x:String>
   <x:String x:Key="Text.AIAssistant" xml:space="preserve">AI Assistant</x:String>
   <x:String x:Key="Text.AIAssistant.BranchName" xml:space="preserve">BRANCH</x:String>
-  <x:String x:Key="Text.AIAssistant.CliTip" xml:space="preserve">Use codely CLI to generate commit message</x:String>
   <x:String x:Key="Text.AIAssistant.CreateBranchAndCommit" xml:space="preserve">CREATE BRANCH &amp; COMMIT</x:String>
+  <x:String x:Key="Text.AIAssistant.NoApiServices" xml:space="preserve">Add an API service in Preferences → AI.</x:String>
+  <x:String x:Key="Text.AIAssistant.NoCliServices" xml:space="preserve">Add a CLI service in Preferences → AI.</x:String>
+  <x:String x:Key="Text.AIAssistant.SelectService" xml:space="preserve">Select an AI service</x:String>
   <x:String x:Key="Text.AIAssistant.Model" xml:space="preserve">MODEL</x:String>
   <x:String x:Key="Text.AIAssistant.Regen" xml:space="preserve">RE-GENERATE</x:String>
   <x:String x:Key="Text.AIAssistant.Tip" xml:space="preserve">Use AI to generate commit message</x:String>
@@ -376,6 +378,25 @@
   <x:String x:Key="Text.DeleteTag" xml:space="preserve">Delete Tag</x:String>
   <x:String x:Key="Text.DeleteTag.Tag" xml:space="preserve">Tag:</x:String>
   <x:String x:Key="Text.DeleteTag.WithRemote" xml:space="preserve">Delete from remote repositories</x:String>
+  <x:String x:Key="Text.DiffAnalysis" xml:space="preserve">AI Analysis</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Ask" xml:space="preserve">Ask</x:String>
+  <x:String x:Key="Text.DiffAnalysis.CopyMarkdown" xml:space="preserve">Copy answer Markdown</x:String>
+  <x:String x:Key="Text.DiffAnalysis.CopyTranscript" xml:space="preserve">Copy full transcript</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Error" xml:space="preserve">Analysis failed: {0}</x:String>
+  <x:String x:Key="Text.DiffAnalysis.FileCount" xml:space="preserve">{0} selected file(s)</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Question" xml:space="preserve">Question: {0}</x:String>
+  <x:String x:Key="Text.DiffAnalysis.QuestionPlaceholder" xml:space="preserve">Ask about this change…</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Restarted" xml:space="preserve">Started a new conversation for this change.</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Retry" xml:space="preserve">Retry</x:String>
+  <x:String x:Key="Text.DiffAnalysis.RunResult" xml:space="preserve">Run result</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Stop" xml:space="preserve">Stop</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Stopped" xml:space="preserve">Analysis stopped.</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Thinking" xml:space="preserve">Thinking</x:String>
+  <x:String x:Key="Text.DiffAnalysis.ToolCall" xml:space="preserve">Tool call</x:String>
+  <x:String x:Key="Text.DiffAnalysis.ToolResult" xml:space="preserve">Tool result</x:String>
+  <x:String x:Key="Text.DiffAnalysis.TraceError" xml:space="preserve">CLI error</x:String>
+  <x:String x:Key="Text.DiffAnalysis.TraceStarted" xml:space="preserve">Analysis started.</x:String>
+  <x:String x:Key="Text.DiffAnalysis.Truncated" xml:space="preserve">This diff excerpt was truncated.</x:String>
   <x:String x:Key="Text.Diff.Binary" xml:space="preserve">BINARY DIFF</x:String>
   <x:String x:Key="Text.Diff.Binary.ViewContentOfNew" xml:space="preserve">VIEW NEW CONTENT</x:String>
   <x:String x:Key="Text.Diff.EmptyFile" xml:space="preserve">EMPTY FILE</x:String>
@@ -699,7 +720,7 @@
   <x:String x:Key="Text.Preferences.AI.Model" xml:space="preserve">Model</x:String>
   <x:String x:Key="Text.Preferences.AI.Model.AutoFetchAvailableModels" xml:space="preserve">Fetch available model-ids automatically</x:String>
   <x:String x:Key="Text.Preferences.AI.Name" xml:space="preserve">Name</x:String>
-  <x:String x:Key="Text.Preferences.AI.PersistConversation" xml:space="preserve">Continue the previous conversation in this repository (--continue)</x:String>
+  <x:String x:Key="Text.Preferences.AI.PersistConversation" xml:space="preserve">Continue the previous generation conversation in this repository</x:String>
   <x:String x:Key="Text.Preferences.AI.ReasoningEffortLevel" xml:space="preserve">Reasoning Effort Level</x:String>
   <x:String x:Key="Text.Preferences.AI.Server" xml:space="preserve">Server</x:String>
   <x:String x:Key="Text.Preferences.Appearance" xml:space="preserve">APPEARANCE</x:String>

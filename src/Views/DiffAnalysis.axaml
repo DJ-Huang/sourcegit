@@ -1,0 +1,127 @@
+<v:ChromelessWindow xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:v="using:SourceGit.Views"
+                    xmlns:vm="using:SourceGit.ViewModels"
+                    xmlns:avaloniaEdit="using:AvaloniaEdit"
+                    mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="660"
+                    x:Class="SourceGit.Views.DiffAnalysis"
+                    x:DataType="vm:DiffAnalysis"
+                    x:Name="ThisControl"
+                    Icon="/App.ico"
+                    Title="{DynamicResource Text.DiffAnalysis}"
+                    Width="900" Height="660" MinWidth="560" MinHeight="380"
+                    CanResize="True"
+                    WindowStartupLocation="CenterOwner">
+  <v:ChromelessWindow.Resources>
+    <Thickness x:Key="ExpanderHeaderPadding">9,0,0,0</Thickness>
+    <Thickness x:Key="ExpanderChevronMargin">6,0,8,0</Thickness>
+    <x:Double x:Key="ExpanderChevronButtonSize">14</x:Double>
+  </v:ChromelessWindow.Resources>
+
+  <v:ChromelessWindow.Styles>
+    <Style Selector="Expander.trace_row /template/ ToggleButton#ExpanderHeader /template/ Path#ExpandCollapseChevron">
+      <Setter Property="Width" Value="9"/>
+      <Setter Property="Height" Value="5"/>
+      <Setter Property="Stretch" Value="Uniform"/>
+    </Style>
+  </v:ChromelessWindow.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <!-- TitleBar -->
+    <Grid Grid.Row="0" Height="28" IsVisible="{Binding !#ThisControl.UseSystemWindowFrame}">
+      <Border Background="{DynamicResource Brush.TitleBar}"
+              BorderThickness="0,0,0,1" BorderBrush="{DynamicResource Brush.Border0}"
+              PointerPressed="BeginMoveWindow"/>
+
+      <Path Width="14" Height="14"
+            Margin="10,0,0,0"
+            HorizontalAlignment="Left"
+            Data="{StaticResource Icons.AIAssist}"
+            IsVisible="{OnPlatform True, macOS=False}"/>
+
+      <TextBlock Classes="bold"
+                 Text="{DynamicResource Text.DiffAnalysis}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                 IsHitTestVisible="False"/>
+
+      <v:CaptionButtons HorizontalAlignment="Right"
+                        IsCloseButtonOnly="True"
+                        IsVisible="{OnPlatform True, macOS=False}"/>
+    </Grid>
+
+    <Grid Grid.Row="1" Margin="8,8,8,0" ColumnDefinitions="*,Auto">
+      <TextBlock Text="{Binding Header}" TextWrapping="Wrap"/>
+      <v:LoadingIcon Grid.Column="1" Width="14" Height="14" Margin="8,0,0,0" IsVisible="{Binding IsBusy}"/>
+    </Grid>
+
+    <Border Grid.Row="2" Margin="8" BorderThickness="1" CornerRadius="4"
+            BorderBrush="{DynamicResource Brush.Border2}" Background="{DynamicResource Brush.Contents}">
+      <ScrollViewer x:Name="ConversationScroll" HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto" ScrollChanged="OnConversationScrollChanged">
+        <ItemsControl Margin="12,10" ItemsSource="{Binding Entries}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="5"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:DiffAnalysisEntry">
+              <Panel>
+                <SelectableTextBlock Text="{Binding Heading}" IsVisible="{Binding IsNotice}"
+                                     Foreground="{DynamicResource Brush.FG2}" TextWrapping="Wrap" Margin="2,3"/>
+                <v:MarkdownView Markdown="{Binding AnswerMarkdown}" IsVisible="{Binding IsAnswer}" HorizontalContentAlignment="Stretch" Margin="2,6"/>
+                <Expander Classes="trace_row" MinWidth="0" MinHeight="28"
+                          IsVisible="{Binding IsTrace}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
+                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="9,5"
+                          BorderBrush="{DynamicResource Brush.Border2}" BorderThickness="1" CornerRadius="4">
+                  <Expander.Header>
+                    <TextBlock Text="{Binding Heading}" FontSize="12" FontWeight="SemiBold"
+                               TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Heading}"/>
+                  </Expander.Header>
+                  <ContentControl Content="{Binding ExpandedEntry}" HorizontalContentAlignment="Stretch">
+                    <ContentControl.ContentTemplate>
+                      <DataTemplate x:DataType="vm:DiffAnalysisEntry">
+                        <StackPanel Spacing="8" Margin="0,0,0,4">
+                          <v:MarkdownView Markdown="{Binding Markdown}" IsVisible="{Binding HasMarkdown}" HorizontalContentAlignment="Stretch" Margin="0,4,0,0"/>
+                          <avaloniaEdit:TextEditor Document="{Binding DetailsDocument, Mode=OneWay}" IsVisible="{Binding HasDetails}"
+                                                   BorderThickness="1" BorderBrush="{DynamicResource Brush.Border2}"
+                                                   Background="{DynamicResource Brush.Contents}"
+                                                   FontFamily="{DynamicResource Fonts.Monospace}" FontSize="12"
+                                                   IsReadOnly="True" MaxHeight="260"
+                                                   HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                  </ContentControl>
+                </Expander>
+              </Panel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+    <Grid Grid.Row="3" Margin="8,0,8,8" ColumnDefinitions="*,Auto,Auto,Auto">
+      <TextBox Grid.Column="0" Text="{Binding Question, Mode=TwoWay}"
+               Watermark="{DynamicResource Text.DiffAnalysis.QuestionPlaceholder}"
+               IsEnabled="{Binding HasAnswer}"/>
+      <Button Grid.Column="1" Margin="8,0,0,0" Classes="flat primary"
+              Content="{Binding SendLabel}" IsVisible="{Binding !IsBusy}" IsEnabled="{Binding CanSend}"
+              Click="OnAskClicked"/>
+      <Button Grid.Column="2" Margin="8,0,0,0" Classes="flat"
+              Content="{DynamicResource Text.DiffAnalysis.Stop}" IsVisible="{Binding IsBusy}" Click="OnStopClicked"/>
+      <Button Grid.Column="3" Margin="8,0,0,0" Classes="flat"
+              Content="{DynamicResource Text.Copy}" IsEnabled="{Binding HasEntries}">
+        <Button.Flyout>
+          <MenuFlyout>
+            <MenuItem Header="{DynamicResource Text.DiffAnalysis.CopyMarkdown}" IsEnabled="{Binding HasAnswer}"
+                      Click="OnCopyMarkdownClicked"/>
+            <MenuItem Header="{DynamicResource Text.DiffAnalysis.CopyTranscript}" Click="OnCopyTranscriptClicked"/>
+          </MenuFlyout>
+        </Button.Flyout>
+      </Button>
+    </Grid>
+  </Grid>
+</v:ChromelessWindow>

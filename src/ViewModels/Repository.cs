@@ -1642,7 +1642,7 @@ namespace SourceGit.ViewModels
             log.Complete();
         }
 
-        public List<AI.Service> GetPreferredOpenAIServices()
+        public List<AI.Service> GetPreferredAIServices()
         {
             var services = Preferences.Instance.OpenAIServices;
             if (services == null || services.Count == 0)
@@ -1664,19 +1664,21 @@ namespace SourceGit.ViewModels
             return all;
         }
 
-        public List<AI.Service> GetPreferredCliServices()
+        public static List<AI.Service> GetCliServices()
         {
-            var services = Preferences.Instance.OpenAIServices;
-            if (services == null || services.Count == 0)
-                return [];
-
             var all = new List<AI.Service>();
-            foreach (var service in services)
+            foreach (var service in Preferences.Instance.OpenAIServices)
             {
                 if (service.IsCliBackend)
                     all.Add(service);
             }
 
+            return all;
+        }
+
+        public List<AI.Service> GetPreferredCliServices()
+        {
+            var all = GetCliServices();
             if (all.Count <= 1)
                 return all;
 

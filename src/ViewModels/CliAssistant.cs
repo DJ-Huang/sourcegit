@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SourceGit.ViewModels
@@ -79,7 +78,6 @@ namespace SourceGit.ViewModels
             _repo = repo;
             _service = service;
             CommandText = string.IsNullOrWhiteSpace(service?.ExecutablePath) ? "codely" : service.ExecutablePath;
-            _cancel = new CancellationTokenSource();
             _text = "Click GENERATE to create a commit message.";
 
             var builder = new StringBuilder();
@@ -93,82 +91,55 @@ namespace SourceGit.ViewModels
 
         public async Task GenAsync()
         {
-            if (_cancel is { IsCancellationRequested: false })
-                _cancel.Cancel();
-            _cancel = new CancellationTokenSource();
+            if (IsGenerating || IsCommitting)
+                return;
 
-            var builder = new StringBuilder();
-            var responseBuilder = new StringBuilder();
-            var foundResponse = false;
+            using var cancel = new CancellationTokenSource();
+            _cancel = cancel;
             var currentBranchName = _repo.CurrentBranch?.Name ?? "main";
-
-            Text = string.Empty;
             Response = string.Empty;
+            BranchName = string.Empty;
             IsGenerating = true;
 
             try
             {
-                builder.AppendLine("Reading staged changes...").AppendLine();
-                Text = builder.ToString();
-
+                Text = "Reading staged changes...";
                 var diff = await new Commands.GetStagedDiffForAI(_repo.FullPath, _amendParent).ReadAsync();
+                cancel.Token.ThrowIfCancellationRequested();
                 if (!diff.IsSuccess)
                     throw new Exception(string.IsNullOrEmpty(diff.StdErr) ? "Failed to read the staged diff." : diff.StdErr);
 
-                builder.AppendLine("Asking codely to generate a commit message...").AppendLine();
-                Text = builder.ToString();
-
-                await new AI.CliAgent(_service).GenerateCommitMessageAsync(
+                Text += "\n\nAsking codely to generate a commit message...";
+                Response = await new AI.CliAgent(_service).GenerateCommitMessageAsync(
                     _repo.FullPath,
                     currentBranchName,
                     _changeList,
                     diff.StdOut,
                     Preferences.Instance.CommitMessageRule,
-                    message =>
-                    {
-                        builder.AppendLine(message);
-
-                        if (foundResponse)
-                        {
-                            if (message.Equals("# Token Usage", StringComparison.Ordinal))
-                                foundResponse = false;
-                            else
-                                responseBuilder.AppendLine(message);
-                        }
-                        else if (message.Equals("# Assistant", StringComparison.Ordinal))
-                        {
-                            foundResponse = true;
-                        }
-
-                        Dispatcher.UIThread.Post(() => Text = builder.ToString());
-                    },
-                    _cancel.Token);
+                    cancel.Token);
+                Text += "\n\n# Assistant\n" + Response;
+                BranchName = SuggestBranchName(Response);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) when (cancel.IsCancellationRequested)
             {
-                return;
+                // The window or the service selection changed.
             }
             catch (Exception e)
             {
-                builder
-                    .AppendLine()
-                    .AppendLine("[ERROR]")
-                    .Append(e.Message);
-
-                Text = builder.ToString();
-                Response = string.Empty;
+                Text += "\n\n[ERROR]\n" + e.Message;
             }
-
-            Response = responseBuilder.ToString().Trim();
-            BranchName = SuggestBranchName(Response);
-            IsGenerating = false;
+            finally
+            {
+                _cancel = null;
+                IsGenerating = false;
+            }
         }
 
         public async Task<bool> CreateBranchAndCommitAsync()
         {
             var message = Response?.Trim() ?? string.Empty;
             var name = BranchName?.Trim() ?? string.Empty;
-            if (string.IsNullOrEmpty(message) || string.IsNullOrEmpty(name))
+            if (!CanCreateBranch || string.IsNullOrEmpty(message) || string.IsNullOrEmpty(name))
                 return false;
 
             IsCommitting = true;
@@ -177,10 +148,10 @@ namespace SourceGit.ViewModels
             try
             {
                 var checkout = new Commands.Checkout(_repo.FullPath).Use(log);
-                if (await checkout.BranchAsync(name, "HEAD", false, false).ConfigureAwait(false))
+                if (await checkout.BranchAsync(name, "HEAD", false, false))
                 {
                     var commit = new Commands.Commit(_repo.FullPath, message, false, false, false, false).Use(log);
-                    succ = await commit.RunAsync().ConfigureAwait(false);
+                    succ = await commit.RunAsync();
                 }
             }
             finally

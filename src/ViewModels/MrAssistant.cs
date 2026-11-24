@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SourceGit.ViewModels
@@ -146,7 +145,6 @@ namespace SourceGit.ViewModels
                 var output = await new AI.CliAgent(_service).RunPromptAsync(
                     _repo.FullPath,
                     prompt,
-                    line => Dispatcher.UIThread.Post(() => Text = builder.AppendLine(line).ToString()),
                     _cancel.Token);
 
                 var (title, description) = ParseOutput(output);
