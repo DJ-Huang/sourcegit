@@ -6,7 +6,7 @@ This document shows the translation status of each locale file in the repository
 
 ### ![en_US](https://img.shields.io/badge/en__US-%E2%88%9A-brightgreen)
 
-### ![ca__ES](https://img.shields.io/badge/ca__ES-98.26%25-yellow)
+### ![ca__ES](https://img.shields.io/badge/ca__ES-98.08%25-yellow)
 
 <details>
 <summary>Missing keys in ca_ES.axaml</summary>
@@ -30,10 +30,12 @@ This document shows the translation status of each locale file in the repository
 - Text.Repository.PinnedBranches
 - Text.Welcome.RefreshStatus
 - Text.Welcome.ToggleStatusCheck
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![de__DE](https://img.shields.io/badge/de__DE-92.21%25-yellow)
+### ![de__DE](https://img.shields.io/badge/de__DE-92.04%25-yellow)
 
 <details>
 <summary>Missing keys in de_DE.axaml</summary>
@@ -123,10 +125,12 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.CollapseSidebar
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![el__GR](https://img.shields.io/badge/el__GR-91.75%25-yellow)
+### ![el__GR](https://img.shields.io/badge/el__GR-91.58%25-yellow)
 
 <details>
 <summary>Missing keys in el_GR.axaml</summary>
@@ -221,10 +225,12 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![es__ES](https://img.shields.io/badge/es__ES-99.27%25-yellow)
+### ![es__ES](https://img.shields.io/badge/es__ES-99.09%25-yellow)
 
 <details>
 <summary>Missing keys in es_ES.axaml</summary>
@@ -237,10 +243,12 @@ This document shows the translation status of each locale file in the repository
 - Text.Repository.PinnedBranches
 - Text.Welcome.RefreshStatus
 - Text.Welcome.ToggleStatusCheck
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![fr__FR](https://img.shields.io/badge/fr__FR-88.08%25-yellow)
+### ![fr__FR](https://img.shields.io/badge/fr__FR-87.92%25-yellow)
 
 <details>
 <summary>Missing keys in fr_FR.axaml</summary>
@@ -375,10 +383,12 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![he__IL](https://img.shields.io/badge/he__IL-88.08%25-yellow)
+### ![he__IL](https://img.shields.io/badge/he__IL-87.92%25-yellow)
 
 <details>
 <summary>Missing keys in he_IL.axaml</summary>
@@ -513,10 +523,12 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![id__ID](https://img.shields.io/badge/id__ID-92.21%25-yellow)
+### ![id__ID](https://img.shields.io/badge/id__ID-92.04%25-yellow)
 
 <details>
 <summary>Missing keys in id_ID.axaml</summary>
@@ -606,10 +618,12 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![it__IT](https://img.shields.io/badge/it__IT-82.22%25-yellow)
+### ![it__IT](https://img.shields.io/badge/it__IT-82.07%25-yellow)
 
 <details>
 <summary>Missing keys in it_IT.axaml</summary>
@@ -805,13 +819,15 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 - Text.Worktree.Branch
 - Text.Worktree.Head
 - Text.Worktree.Path
 
 </details>
 
-### ![ja__JP](https://img.shields.io/badge/ja__JP-96.15%25-yellow)
+### ![ja__JP](https://img.shields.io/badge/ja__JP-95.97%25-yellow)
 
 <details>
 <summary>Missing keys in ja_JP.axaml</summary>
@@ -858,10 +874,12 @@ This document shows the translation status of each locale file in the repository
 - Text.Welcome.ToggleStatusCheck
 - Text.WorkingCopy.CollapseSidebar
 - Text.WorkingCopy.ExpandSidebar
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![ko__KR](https://img.shields.io/badge/ko__KR-89.46%25-yellow)
+### ![ko__KR](https://img.shields.io/badge/ko__KR-89.30%25-yellow)
 
 <details>
 <summary>Missing keys in ko_KR.axaml</summary>
@@ -981,10 +999,12 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![pt__BR](https://img.shields.io/badge/pt__BR-58.02%25-red)
+### ![pt__BR](https://img.shields.io/badge/pt__BR-57.91%25-red)
 
 <details>
 <summary>Missing keys in pt_BR.axaml</summary>
@@ -1439,6 +1459,8 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 - Text.WorkingCopy.NoVerify
 - Text.WorkingCopy.ResetAuthor
 - Text.WorkingCopy.SignOff
@@ -1450,7 +1472,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![ru__RU](https://img.shields.io/badge/ru__RU-99.54%25-yellow)
+### ![ru__RU](https://img.shields.io/badge/ru__RU-99.36%25-yellow)
 
 <details>
 <summary>Missing keys in ru_RU.axaml</summary>
@@ -1460,10 +1482,12 @@ This document shows the translation status of each locale file in the repository
 - Text.GotoLine
 - Text.GotoLine.Range
 - Text.Repository.PinnedBranches
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 
 </details>
 
-### ![ta__IN](https://img.shields.io/badge/ta__IN-59.58%25-red)
+### ![ta__IN](https://img.shields.io/badge/ta__IN-59.47%25-red)
 
 <details>
 <summary>Missing keys in ta_IN.axaml</summary>
@@ -1902,6 +1926,8 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 - Text.WorkingCopy.NoVerify
 - Text.WorkingCopy.ResetAuthor
 - Text.Worktree.Branch
@@ -1912,7 +1938,7 @@ This document shows the translation status of each locale file in the repository
 
 </details>
 
-### ![uk__UA](https://img.shields.io/badge/uk__UA-60.31%25-red)
+### ![uk__UA](https://img.shields.io/badge/uk__UA-60.20%25-red)
 
 <details>
 <summary>Missing keys in uk_UA.axaml</summary>
@@ -2343,6 +2369,8 @@ This document shows the translation status of each locale file in the repository
 - Text.WorkingCopy.DiscardAll
 - Text.WorkingCopy.ExpandSidebar
 - Text.WorkingCopy.FilterChanges
+- Text.WorkingCopy.IssueLinks
+- Text.WorkingCopy.NoIssueLinksFound
 - Text.WorkingCopy.NoVerify
 - Text.WorkingCopy.ResetAuthor
 - Text.Worktree.Branch
