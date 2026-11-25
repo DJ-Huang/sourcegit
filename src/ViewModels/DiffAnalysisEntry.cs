@@ -13,7 +13,8 @@ namespace SourceGit.ViewModels
         public string AnswerMarkdown => IsAnswer ? _markdown : null;
         public bool IsAnswer => _type == "answer";
         public bool IsNotice => _type == "notice";
-        public bool IsTrace => !IsAnswer && !IsNotice;
+        public bool IsQuestion => _type == "question";
+        public bool IsTrace => !IsAnswer && !IsNotice && !IsQuestion;
         public bool HasDetails => !string.IsNullOrEmpty(Details);
         public bool HasMarkdown => !string.IsNullOrEmpty(_markdown);
 
@@ -39,7 +40,7 @@ namespace SourceGit.ViewModels
 
         public DiffAnalysisEntry ExpandedEntry => _isExpanded ? this : null;
 
-        internal DiffAnalysisEntry(AI.CliTraceEvent entry)
+        internal DiffAnalysisEntry(AI.ExternalCliEvent entry)
         {
             _type = entry.Type;
             Heading = GetHeading(entry);
@@ -67,18 +68,17 @@ namespace SourceGit.ViewModels
                 buffer.Append('\n').Append(Details);
         }
 
-        private static string GetHeading(AI.CliTraceEvent entry)
+        private static string GetHeading(AI.ExternalCliEvent entry)
         {
-            if (entry.Type == "notice")
+            if (entry.Type is "notice" or "question")
                 return entry.Payload;
 
             var title = entry.Type switch
             {
                 "answer" => string.Empty,
-                "thinking" or "reasoning" or "agent_think" => App.Text("DiffAnalysis.Thinking"),
-                "tool_use" or "agent_tool_use" => App.Text("DiffAnalysis.ToolCall"),
-                "tool_result" or "agent_tool_result" => App.Text("DiffAnalysis.ToolResult"),
-                "result" => App.Text("DiffAnalysis.RunResult"),
+                "thinking" => App.Text("DiffAnalysis.Thinking"),
+                "tool_call" => App.Text("DiffAnalysis.ToolCall"),
+                "tool_result" => App.Text("DiffAnalysis.ToolResult"),
                 "error" => App.Text("DiffAnalysis.TraceError"),
                 _ => entry.Type,
             };

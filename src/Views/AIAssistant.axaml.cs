@@ -142,12 +142,12 @@ namespace SourceGit.Views
             InitializeComponent();
         }
 
-        public static void Open(Control control, ViewModels.Repository repo, List<Models.Change> changes, AI.Service selected = null)
+        public static void Open(Control control, ViewModels.Repository repo, List<Models.Change> changes, AI.Service selected = null, bool allStaged = false)
         {
             if (TopLevel.GetTopLevel(control) is not Window owner)
                 return;
 
-            var view = new AIAssistant() { DataContext = new ViewModels.CommitAssistant(repo, changes, selected) };
+            var view = new AIAssistant() { DataContext = new ViewModels.CommitAssistant(repo, changes, selected, allStaged) };
             view.Show(owner);
             view.Activate();
         }
@@ -161,6 +161,8 @@ namespace SourceGit.Views
         protected override void OnClosing(WindowClosingEventArgs e)
         {
             base.OnClosing(e);
+            if (DataContext is ViewModels.CommitAssistant { Cli.IsCommitting: true })
+                e.Cancel = true;
             if (!e.Cancel)
                 (DataContext as ViewModels.CommitAssistant)?.Close();
         }
@@ -194,22 +196,22 @@ namespace SourceGit.Views
             e.Handled = true;
         }
 
-        private async void OnCreateBranchAndCommitClicked(object sender, RoutedEventArgs e)
+        private void OnStopCliClicked(object sender, RoutedEventArgs e)
         {
-            if (sender is not Control { DataContext: ViewModels.CliAssistant vm })
+            (DataContext as ViewModels.CommitAssistant)?.Cli?.Cancel();
+            e.Handled = true;
+        }
+
+        private async void OnCreateBranchClicked(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (sender is not Control { DataContext: ViewModels.CliAssistant { CanCommitOnNewBranch: true } vm })
                 return;
 
-            if (await vm.CreateBranchAndCommitAsync())
-            {
-                vm.Use(string.Empty);
+            var confirm = new Confirm();
+            confirm.SetData(vm.BranchConfirmation, Models.ConfirmButtonType.OkCancel);
+            if (await confirm.ShowDialog<bool>(this) && await vm.CommitOnNewBranchAsync())
                 Close();
-            }
-            else
-            {
-                vm.AppendError("[ERROR] Failed to create the branch or commit. Check the logs for details.");
-            }
-
-            e.Handled = true;
         }
     }
 }

@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SourceGit.ViewModels
 {
-    public record DiffAnalysisSnapshot(string Scope, string Path, string OriginalPath, string Source, string Patch, bool Truncated)
+    public record DiffAnalysisSnapshot(string Scope, string Path, string OriginalPath, string Source, string Patch,
+        bool Truncated, bool HasNonText = false, bool HasChangesInScope = true)
     {
+        internal const int MaxDiffChars = 200 * 1024;
+
         public static DiffAnalysisSnapshot Create(TextDiffContext context, int start, int end, bool hasSelection, bool isOldSide)
         {
             var lines = context.Data.Lines;
@@ -18,10 +22,21 @@ namespace SourceGit.ViewModels
             end = Math.Min(end, side.Count - 1);
             if (context is TwoSideTextDiff split)
             {
-                if (hasSelection && !HasChanges(side, start, end))
-                    return null;
+                if (hasSelection)
+                {
+                    var selected = new HashSet<Models.TextDiffLine>();
+                    for (var i = start; i <= end; i++)
+                    {
+                        selected.Add(split.Old[i]);
+                        selected.Add(split.New[i]);
+                    }
 
-                if (!hasSelection && side[start].Type == Models.TextDiffLineType.None)
+                    var excerpt = lines.Where(selected.Contains).ToList();
+                    return HasChanges(excerpt, 0, excerpt.Count - 1)
+                        ? Format(context.Option, excerpt, 0, excerpt.Count - 1, MaxDiffChars) : null;
+                }
+
+                if (side[start].Type == Models.TextDiffLineType.None)
                 {
                     var opposite = isOldSide ? split.New : split.Old;
                     start = end = lines.IndexOf(opposite[start]);
@@ -53,39 +68,20 @@ namespace SourceGit.ViewModels
                         end++;
                 }
             }
-            else if (context.IsSideBySide())
-            {
-                // Consecutive deletions and additions form the two sides of a replacement.
-                while (start > 0 && IsChange(lines[start]) && IsChange(lines[start - 1]))
-                    start--;
-                while (end + 1 < lines.Count && IsChange(lines[end]) && IsChange(lines[end + 1]))
-                    end++;
-            }
-
             if (!HasChanges(lines, start, end))
                 return null;
 
-            return Format(context.Option, lines, start, end, AI.CliAgent.MaxDiffChars);
+            return Format(context.Option, lines, start, end, MaxDiffChars);
         }
 
         internal static async Task<DiffAnalysisSnapshot> ReadCommitAsync(
             string repo, Models.Commit commit, CancellationToken cancellation)
         {
-            cancellation.ThrowIfCancellationRequested();
             var parent = commit.FirstParentToCompare;
-            var changes = await new Commands.CompareRevisions(repo, parent, commit.SHA)
-                .ReadAsync().WaitAsync(cancellation).ConfigureAwait(false);
-
-            if (changes.Count == 0)
-                return null;
-
-            var options = changes.ConvertAll(change => new Models.DiffOption(parent, commit.SHA, change)).ToArray();
-            var snapshot = await ReadSelectionAsync(repo, options, cancellation).ConfigureAwait(false);
-            return snapshot with
-            {
-                Path = $"Commit {commit.SHA} ({options.Length} changed files)",
-                Source = $"{parent} → {commit.SHA}",
-            };
+            var diff = await new Commands.GetAIDiff(repo, $"{parent} {commit.SHA} --")
+                .ReadAsync(MaxDiffChars, cancellation).ConfigureAwait(false);
+            return diff.Text.Length == 0 ? null : new(string.Empty, $"Commit {commit.SHA}", string.Empty,
+                $"{parent} → {commit.SHA}", diff.Text, diff.Truncated, HasNonTextChanges(diff.Text));
         }
 
         public static async Task<DiffAnalysisSnapshot> ReadSelectionAsync(
@@ -93,13 +89,15 @@ namespace SourceGit.ViewModels
         {
             var patch = new StringBuilder();
             var truncated = false;
+            var nonText = false;
+            var hasChanges = false;
             for (var i = 0; i < options.Length; i++)
             {
                 cancellation.ThrowIfCancellationRequested();
                 var option = options[i];
                 var path = DisplayPath(option.Path, option.OrgPath);
                 var heading = $"\n--- {path} ({DescribeSource(option)}) ---\n";
-                var remaining = AI.CliAgent.MaxDiffChars - patch.Length - heading.Length;
+                var remaining = MaxDiffChars - patch.Length - heading.Length;
                 if (remaining <= 0)
                 {
                     truncated = true;
@@ -115,29 +113,33 @@ namespace SourceGit.ViewModels
                     continue;
                 }
 
-                var diff = await new Commands.Diff(repo, option, 3, false, false)
-                {
-                    CancellationToken = cancellation,
-                }.ReadAsync().ConfigureAwait(false);
-                cancellation.ThrowIfCancellationRequested();
-
-                if (diff.TextDiff?.Lines is { Count: > 0 } lines)
-                {
-                    var excerpt = Format(option, lines, 0, lines.Count - 1, budget);
-                    patch.Append(excerpt.Patch);
-                    truncated |= excerpt.Truncated;
-                }
-                else
+                var range = option.ToString();
+                var diff = await new Commands.GetAIDiff(repo, range, range.StartsWith("--no-index ", StringComparison.Ordinal))
+                    .ReadAsync(budget, cancellation).ConfigureAwait(false);
+                truncated |= diff.Truncated;
+                nonText |= HasNonTextChanges(diff.Text);
+                if (diff.Text.Length == 0)
                 {
                     const string note = "[No text diff available]\n";
                     patch.Append(note.AsSpan(0, Math.Min(budget, note.Length)));
                     truncated |= budget < note.Length;
                 }
+                else
+                {
+                    hasChanges = true;
+                    patch.Append(diff.Text);
+                    if (diff.Text[^1] != '\n' && patch.Length < MaxDiffChars)
+                        patch.Append('\n');
+                }
             }
 
             var subject = $"{options.Length} selected files";
-            return new(string.Empty, subject, string.Empty, "See the source next to each file below", patch.ToString(), truncated);
+            return new(string.Empty, subject, string.Empty, "See the source next to each file below", patch.ToString(), truncated, nonText, hasChanges);
         }
+
+        private static bool HasNonTextChanges(string diff) =>
+            diff.Split("\ndiff --git ", StringSplitOptions.None)
+                .Any(static file => !file.Contains("\n@@ ", StringComparison.Ordinal) || file.Contains("\nBinary files ", StringComparison.Ordinal));
 
         public static string DisplayPath(string path, string originalPath) =>
             string.IsNullOrEmpty(originalPath) || originalPath == "/dev/null" ? path : $"{originalPath} → {path}";

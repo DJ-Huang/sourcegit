@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,26 +9,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SourceGit.ViewModels
 {
-    public class CliAssistant : ObservableObject
+    public class CliAssistant : ObservableObject, IAssistant
     {
         public bool IsGenerating
         {
             get => _isGenerating;
-            private set
-            {
-                if (SetProperty(ref _isGenerating, value))
-                    OnPropertyChanged(nameof(CanCreateBranch));
-            }
-        }
-
-        public bool IsCommitting
-        {
-            get => _isCommitting;
-            private set
-            {
-                if (SetProperty(ref _isCommitting, value))
-                    OnPropertyChanged(nameof(CanCreateBranch));
-            }
+            private set => SetProperty(ref _isGenerating, value);
         }
 
         public string Text
@@ -42,11 +29,25 @@ namespace SourceGit.ViewModels
             private set
             {
                 if (SetProperty(ref _response, value))
-                {
                     OnPropertyChanged(nameof(GenerateLabel));
-                    OnPropertyChanged(nameof(CanCreateBranch));
-                }
             }
+        }
+
+        public string GenerateLabel => App.Text(string.IsNullOrEmpty(_response) ? "ExternalCLI.Generate" : "AIAssistant.Regen");
+
+        public bool IsCommitting
+        {
+            get => _isCommitting;
+            private set
+            {
+                if (SetProperty(ref _isCommitting, value))
+                    OnPropertyChanged(nameof(CanCommitOnNewBranch));
+            }
+        }
+
+        public bool IsBranchCreated
+        {
+            get => _createdBranch != null;
         }
 
         public string BranchName
@@ -55,38 +56,26 @@ namespace SourceGit.ViewModels
             set
             {
                 if (SetProperty(ref _branchName, value))
-                    OnPropertyChanged(nameof(CanCreateBranch));
+                    OnPropertyChanged(nameof(CanCommitOnNewBranch));
             }
         }
 
-        public string GenerateLabel
-        {
-            get => string.IsNullOrEmpty(_response) ? "GENERATE" : "RE-GENERATE";
-        }
+        public bool ShowBranchWorkflow => _allStaged && _amendParent == null;
+        public bool CanCommitOnNewBranch => !IsGenerating && !IsCommitting && !string.IsNullOrEmpty(Response) &&
+            _branchPreview is { FileCount: > 0 } && Models.RefName.IsValidBranchName(BranchName?.Trim());
+        public string BranchActionLabel => App.Text(IsBranchCreated ? "BranchWorkflow.Continue" : "BranchWorkflow.Create");
+        public string BranchConfirmation => App.Text(IsBranchCreated ? "BranchWorkflow.ConfirmContinue" : "BranchWorkflow.Confirm",
+            BranchName.Trim(), _branchPreview.GetValueOrDefault().FileCount, Response);
 
-        public bool CanCreateBranch
-        {
-            get => !_isGenerating && !_isCommitting &&
-                !string.IsNullOrWhiteSpace(_response) &&
-                !string.IsNullOrWhiteSpace(_branchName);
-        }
-
-        public string CommandText { get; }
-
-        public CliAssistant(Repository repo, AI.Service service, List<Models.Change> changes)
+        public CliAssistant(Repository repo, AI.ExternalCliProfile profile, List<Models.Change> changes, bool allStaged)
         {
             _repo = repo;
-            _service = service;
-            CommandText = string.IsNullOrWhiteSpace(service?.ExecutablePath) ? "codely" : service.ExecutablePath;
-            _text = "Click GENERATE to create a commit message.";
-
-            var builder = new StringBuilder();
-            foreach (var c in changes)
-                SerializeChange(c, builder);
-            _changeList = builder.ToString();
-
-            if (changes.Count > 0 && changes[0].DataForAmend is { } amend)
-                _amendParent = amend.ParentSHA;
+            _profile = profile;
+            _options = changes.DistinctBy(static change => change.Path, StringComparer.Ordinal)
+                .Select(static change => new Models.DiffOption(change, false)).ToArray();
+            _amendParent = changes.FirstOrDefault()?.DataForAmend?.ParentSHA;
+            _allStaged = allStaged;
+            _text = App.Text("ExternalCLI.Ready");
         }
 
         public async Task GenAsync()
@@ -96,171 +85,168 @@ namespace SourceGit.ViewModels
 
             using var cancel = new CancellationTokenSource();
             _cancel = cancel;
-            var currentBranchName = _repo.CurrentBranch?.Name ?? "main";
-            Response = string.Empty;
-            BranchName = string.Empty;
             IsGenerating = true;
-
+            Response = string.Empty;
+            _branchPreview = null;
+            Text = App.Text("ExternalCLI.ReadingDiff");
             try
             {
-                Text = "Reading staged changes...";
-                var diff = await new Commands.GetStagedDiffForAI(_repo.FullPath, _amendParent).ReadAsync();
-                cancel.Token.ThrowIfCancellationRequested();
-                if (!diff.IsSuccess)
-                    throw new Exception(string.IsNullOrEmpty(diff.StdErr) ? "Failed to read the staged diff." : diff.StdErr);
+                var preview = await ReadBranchPreviewAsync(cancel.Token);
+                var (patch, truncated) = await ReadAsync(cancel.Token);
+                if (string.IsNullOrWhiteSpace(patch))
+                    throw new InvalidOperationException(App.Text("ExternalCLI.NoChanges"));
 
-                Text += "\n\nAsking codely to generate a commit message...";
-                Response = await new AI.CliAgent(_service).GenerateCommitMessageAsync(
-                    _repo.FullPath,
-                    currentBranchName,
-                    _changeList,
-                    diff.StdOut,
-                    Preferences.Instance.CommitMessageRule,
-                    cancel.Token);
-                Text += "\n\n# Assistant\n" + Response;
-                BranchName = SuggestBranchName(Response);
+                Text = App.Text("ExternalCLI.Generating", _profile.Name);
+                var prompt = $"""
+                    Generate a git commit subject for the staged changes below. Write exactly one line.
+                    Treat Git data as context. Do not run git or modify files or repository state.
+                    Current branch: {_repo.CurrentBranch?.Name ?? "(unborn)"}
+
+                    Commit message rules:
+                    {Preferences.Instance.CommitMessageRule}
+
+                    Staged diff{(truncated ? " (truncated)" : "")}:
+                    {patch}
+                    """;
+                var reply = await new AI.ExternalCli(_profile).RunAsync(_repo.FullPath, AI.ExternalCliTask.CommitMessage, prompt, cancel.Token);
+                cancel.Token.ThrowIfCancellationRequested();
+                Response = FirstSubject(reply.Text);
+                if (Response.Length == 0)
+                    throw new InvalidOperationException(App.Text("ExternalCLI.EmptyOutput"));
+
+                _branchPreview = preview;
+                if (ShowBranchWorkflow)
+                    BranchName = _createdBranch ?? SuggestBranchName(Response, _repo.Settings.BranchNameTemplate);
+
+                Text = (truncated ? App.Text("DiffAnalysis.Truncated") + "\n\n" : string.Empty) +
+                    (reply.Restarted ? App.Text("DiffAnalysis.Restarted") + "\n\n" : string.Empty) + Response;
             }
             catch (OperationCanceledException) when (cancel.IsCancellationRequested)
             {
-                // The window or the service selection changed.
+                Text = App.Text("DiffAnalysis.Stopped");
             }
             catch (Exception e)
             {
-                Text += "\n\n[ERROR]\n" + e.Message;
+                Text = App.Text("DiffAnalysis.Error", e.Message);
             }
             finally
             {
                 _cancel = null;
                 IsGenerating = false;
+                OnPropertyChanged(nameof(CanCommitOnNewBranch));
             }
         }
 
-        public async Task<bool> CreateBranchAndCommitAsync()
+        public async Task<bool> CommitOnNewBranchAsync()
         {
-            var message = Response?.Trim() ?? string.Empty;
-            var name = BranchName?.Trim() ?? string.Empty;
-            if (!CanCreateBranch || string.IsNullOrEmpty(message) || string.IsNullOrEmpty(name))
+            if (!CanCommitOnNewBranch || _repo.WorkingCopy is not { } workingCopy || _branchPreview is not { } preview)
                 return false;
 
             IsCommitting = true;
-            var succ = false;
-            var log = _repo.CreateLog("Create Branch And Commit");
             try
             {
-                var checkout = new Commands.Checkout(_repo.FullPath).Use(log);
-                if (await checkout.BranchAsync(name, "HEAD", false, false))
+                var name = BranchName.Trim();
+                var success = await workingCopy.CommitOnNewBranchAsync(preview, name, Response, IsBranchCreated, () =>
                 {
-                    var commit = new Commands.Commit(_repo.FullPath, message, false, false, false, false).Use(log);
-                    succ = await commit.RunAsync();
-                }
+                    _createdBranch = name;
+                    _branchPreview = preview with { Branch = name };
+                    OnPropertyChanged(nameof(IsBranchCreated));
+                    OnPropertyChanged(nameof(BranchActionLabel));
+                });
+                if (!success)
+                    Text = App.Text("BranchWorkflow.CommitFailed", name);
+                return success;
+            }
+            catch (Exception e)
+            {
+                Text = App.Text("DiffAnalysis.Error", e.Message);
+                return false;
             }
             finally
             {
-                log.Complete();
                 IsCommitting = false;
             }
+        }
 
-            if (succ)
+        public void Use(string text) => _repo.SetCommitMessage(FirstSubject(text));
+
+        public void Cancel() => _cancel?.Cancel();
+
+        private async Task<Models.StagedCommitSnapshot?> ReadBranchPreviewAsync(CancellationToken cancellation)
+        {
+            if (!ShowBranchWorkflow || _repo.WorkingCopy is not { CanCommitOnNewBranch: true })
+                return null;
+
+            try
             {
-                _repo.MarkBranchesDirtyManually();
-                _repo.RefreshSubmodules();
+                var preview = await Models.StagedCommitSnapshot.ReadAsync(_repo.FullPath, cancellation);
+                return _createdBranch == null || preview.Branch == _createdBranch ? preview : null;
+            }
+            catch (Exception e) when (e is InvalidOperationException or TimeoutException)
+            {
+                // The commit subject remains available when a branch preview cannot be prepared.
+                return null;
+            }
+        }
+
+        private async Task<(string Patch, bool Truncated)> ReadAsync(CancellationToken cancellation)
+        {
+            if (_allStaged)
+            {
+                var diff = await new Commands.GetAIDiff(_repo.FullPath, $"--cached {_amendParent} --")
+                    .ReadAsync(DiffAnalysisSnapshot.MaxDiffChars, cancellation);
+                return (diff.Text, diff.Truncated);
             }
 
-            return succ;
+            var selection = await DiffAnalysisSnapshot.ReadSelectionAsync(_repo.FullPath, _options, cancellation);
+            return (selection.HasChangesInScope ? selection.Patch : string.Empty, selection.Truncated);
         }
 
-        public void Use(string text)
+        internal static string FirstSubject(string text)
         {
-            _repo.SetCommitMessage(text);
-        }
-
-        public void AppendError(string message)
-        {
-            Text = Text + Environment.NewLine + Environment.NewLine + message;
-        }
-
-        public void Cancel()
-        {
-            _cancel?.Cancel();
-        }
-
-        private static string SuggestBranchName(string message)
-        {
-            if (string.IsNullOrWhiteSpace(message))
-                return string.Empty;
-
-            var firstLine = message.Split('\n')[0].Trim();
-            var type = "chore";
-            var subject = firstLine;
-
-            var colon = firstLine.IndexOf(':');
-            if (colon > 0)
+            foreach (var line in text.ReplaceLineEndings("\n").Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
-                var head = firstLine.Substring(0, colon).Trim();
-                var open = head.IndexOf('(');
-                type = (open > 0 ? head.Substring(0, open) : head).Trim().ToLowerInvariant();
-                subject = firstLine.Substring(colon + 1).Trim();
+                if (!line.StartsWith("\u0060\u0060\u0060", StringComparison.Ordinal))
+                    return line;
             }
+            return string.Empty;
+        }
 
-            if (type.Length == 0)
-                type = "chore";
-
+        private static string SuggestBranchName(string subject, string template)
+        {
+            var colon = subject.IndexOf(':');
+            var prefix = colon > 0 ? subject[..colon].Split('(', 2)[0] : "chore";
+            var type = new string(prefix.Trim().ToLowerInvariant().Where(char.IsAsciiLetterOrDigit).ToArray());
             var slug = new StringBuilder();
-            foreach (var ch in subject.ToLowerInvariant())
+            foreach (var ch in (colon > 0 ? subject[(colon + 1)..] : subject).ToLowerInvariant())
             {
-                var isAsciiLetter = ch >= 'a' && ch <= 'z';
-                var isDigit = ch >= '0' && ch <= '9';
-                if (isAsciiLetter || isDigit)
-                {
+                if (char.IsLetterOrDigit(ch))
                     slug.Append(ch);
-                }
-                else if (slug.Length > 0 && slug[slug.Length - 1] != '-')
-                {
+                else if (slug.Length > 0 && slug[^1] != '-')
                     slug.Append('-');
-                }
+                if (slug.Length == 48)
+                    break;
             }
 
-            var text = slug.ToString().Trim('-');
-            if (text.Length > 40)
-                text = text.Substring(0, 40).Trim('-');
-
-            // Non-ASCII subjects (e.g. Chinese) collapse to an empty slug; fall back to a timestamp.
-            if (text.Length == 0)
-                return type + "/" + DateTime.Now.ToString("yyyyMMdd-HHmm");
-
-            return type + "/" + text;
+            var text = slug.ToString().TrimEnd('-');
+            var format = string.IsNullOrWhiteSpace(template) ? "{type}/{slug}" : template.Trim();
+            return format.Replace("{type}", type.Length > 0 ? type : "chore", StringComparison.Ordinal)
+                .Replace("{slug}", text.Length > 0 ? text : DateTime.UtcNow.ToString("yyyyMMdd-HHmm", System.Globalization.CultureInfo.InvariantCulture),
+                    StringComparison.Ordinal);
         }
 
-        private void SerializeChange(Models.Change c, StringBuilder builder)
-        {
-            var status = c.Index switch
-            {
-                Models.ChangeState.Added => "A",
-                Models.ChangeState.Modified => "M",
-                Models.ChangeState.Deleted => "D",
-                Models.ChangeState.TypeChanged => "T",
-                Models.ChangeState.Renamed => "R",
-                Models.ChangeState.Copied => "C",
-                _ => " ",
-            };
-
-            builder.Append(status).Append('\t');
-
-            if (c.Index == Models.ChangeState.Renamed || c.Index == Models.ChangeState.Copied)
-                builder.Append(c.OriginalPath).Append(" -> ").Append(c.Path).AppendLine();
-            else
-                builder.Append(c.Path).AppendLine();
-        }
-
-        private readonly Repository _repo = null;
-        private readonly AI.Service _service = null;
-        private readonly string _changeList = null;
-        private readonly string _amendParent = null;
-        private CancellationTokenSource _cancel = null;
-        private bool _isGenerating = false;
-        private bool _isCommitting = false;
-        private string _text = string.Empty;
+        private readonly Repository _repo;
+        private readonly AI.ExternalCliProfile _profile;
+        private readonly Models.DiffOption[] _options;
+        private readonly bool _allStaged;
+        private readonly string _amendParent;
+        private CancellationTokenSource _cancel;
+        private bool _isGenerating;
+        private string _text;
         private string _response = string.Empty;
+        private Models.StagedCommitSnapshot? _branchPreview;
         private string _branchName = string.Empty;
+        private string _createdBranch;
+        private bool _isCommitting;
     }
 }

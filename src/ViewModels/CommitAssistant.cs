@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -8,9 +9,10 @@ namespace SourceGit.ViewModels
     public class CommitAssistant : ObservableObject
     {
         public List<AI.Service> ApiServices { get; }
-        public List<AI.Service> CliServices { get; }
+        public AI.ExternalCliProfile[] CliServices { get; }
         public bool HasApiServices => ApiServices.Count > 0;
-        public bool HasCliServices => CliServices.Count > 0;
+        public bool HasCliServices => CliServices.Length > 0;
+        public bool HasApiChoice => HasApiServices && (HasCliServices || ApiServices.Count > 1);
         public bool HasApiSelection => _selectedApiService != null;
 
         public AIAssistant Api
@@ -50,7 +52,7 @@ namespace SourceGit.ViewModels
             }
         }
 
-        public AI.Service SelectedCliService
+        public AI.ExternalCliProfile SelectedCliService
         {
             get => _selectedCliService;
             set
@@ -59,34 +61,26 @@ namespace SourceGit.ViewModels
                     return;
 
                 Cli?.Cancel();
-                Cli = value == null ? null : new CliAssistant(_repo, value, _changes);
+                Cli = value == null ? null : new CliAssistant(_repo, value, _changes, _allStaged);
                 OnPropertyChanged(nameof(HasCliSelection));
             }
         }
 
         public bool HasCliSelection => _selectedCliService != null;
 
-        public CommitAssistant(Repository repo, List<Models.Change> changes, AI.Service selected = null)
+        internal static AI.ExternalCliProfile[] AvailableCliProfiles() =>
+            AI.ExternalCliProfile.Available().Where(static profile => profile.CanGenerateCommit).ToArray();
+
+        public CommitAssistant(Repository repo, List<Models.Change> changes, AI.Service selected = null, bool allStaged = false)
         {
             _repo = repo;
             _changes = [.. changes];
-            var preferred = repo.Settings.PreferredOpenAIService;
-            var apiServices = new List<AI.Service>();
-            foreach (var service in Preferences.Instance.OpenAIServices)
-            {
-                if (!service.IsCliBackend)
-                    apiServices.Add(service);
-            }
-
-            var preferredApi = apiServices.Find(s => string.Equals(s.Name, preferred, StringComparison.Ordinal));
-            ApiServices = preferredApi != null ? [preferredApi] : apiServices;
-            CliServices = Repository.GetCliServices();
-            _selectedApiService = selected is { IsCliBackend: false } ? selected :
-                ApiServices.Count == 1 ? ApiServices[0] : null;
-            SelectedCliService = selected is { IsCliBackend: true } ? selected :
-                CliServices.Find(s => string.Equals(s.Name, preferred, StringComparison.Ordinal)) ??
-                (HasCliServices ? CliServices[0] : null);
-            _selectedTab = selected?.IsCliBackend == true || (!HasApiServices && HasCliServices) ? 1 : 0;
+            _allStaged = allStaged;
+            ApiServices = repo.GetPreferredOpenAIServices();
+            CliServices = AvailableCliProfiles();
+            _selectedApiService = selected ?? (ApiServices.Count == 1 ? ApiServices[0] : null);
+            SelectedCliService = Array.Find(CliServices, profile => profile.Id == repo.Settings.PreferredExternalCli) ?? CliServices.FirstOrDefault();
+            _selectedTab = !HasApiServices && HasCliServices ? 1 : 0;
         }
 
         public void Open()
@@ -113,10 +107,11 @@ namespace SourceGit.ViewModels
 
         private readonly Repository _repo;
         private readonly List<Models.Change> _changes;
+        private readonly bool _allStaged;
         private bool _opened;
         private int _selectedTab;
         private AI.Service _selectedApiService;
-        private AI.Service _selectedCliService;
+        private AI.ExternalCliProfile _selectedCliService;
         private AIAssistant _api;
         private CliAssistant _cli;
     }

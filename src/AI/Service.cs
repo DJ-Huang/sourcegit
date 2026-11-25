@@ -12,8 +12,6 @@ namespace SourceGit.AI
 {
     public class Service : ObservableObject
     {
-        public static string[] Backends { get; } = [BackendOpenAI, BackendCli];
-
         public string Name
         {
             get => _name;
@@ -101,43 +99,21 @@ namespace SourceGit.AI
             set;
         } = string.Empty;
 
-        public string Backend
-        {
-            get => _backend;
-            set
-            {
-                if (SetProperty(ref _backend, value))
-                    OnPropertyChanged(nameof(IsCliBackend));
-            }
-        }
+        // Retained for importing preferences from builds that stored CLI entries with API services.
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Backend { get; set; }
 
         [JsonIgnore]
-        public bool IsCliBackend
-        {
-            get => _backend.Equals(BackendCli, StringComparison.OrdinalIgnoreCase);
-        }
+        internal bool IsCliBackend => string.Equals(Backend, "cli", StringComparison.OrdinalIgnoreCase);
 
-        public string ExecutablePath
-        {
-            get => _executablePath;
-            set => SetProperty(ref _executablePath, value);
-        }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string ExecutablePath { get; set; }
 
-        public string ExtraArguments
-        {
-            get;
-            set;
-        } = string.Empty;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string ExtraArguments { get; set; }
 
-        /// <summary>
-        /// When enabled, consecutive generations in the same repository continue the
-        /// previous CLI conversation (<c>--continue</c>) instead of starting a new one.
-        /// </summary>
-        public bool PersistConversation
-        {
-            get;
-            set;
-        } = false;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public bool PersistConversation { get; set; }
 
         public OpenAIClient GetOpenAIClient()
         {
@@ -161,14 +137,10 @@ namespace SourceGit.AI
             return new OpenAIClient(credential, options);
         }
 
-        private const string BackendOpenAI = "openai";
-        private const string BackendCli = "cli";
 
         private string _name = string.Empty;
         private string _server = string.Empty;
         private string _model = string.Empty;
-        private string _backend = BackendOpenAI;
-        private string _executablePath = "codely";
         private string _reasoningEffortLevel = Options.IgnoredReasoningEffortLevel;
         private bool _autoFetchAvailableModels = true;
     }

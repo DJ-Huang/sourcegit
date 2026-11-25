@@ -37,11 +37,16 @@
                         IsVisible="{OnPlatform True, macOS=False}"/>
     </Grid>
 
-    <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}">
-      <TabItem Header="API">
+    <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" Classes.api_only="{Binding !HasCliServices}">
+      <TabControl.Styles>
+        <Style Selector="TabControl.api_only /template/ ItemsPresenter#PART_ItemsPresenter">
+          <Setter Property="IsVisible" Value="False"/>
+        </Style>
+      </TabControl.Styles>
+      <TabItem Header="API" IsEnabled="{Binding !Cli.IsCommitting, FallbackValue=True}">
         <Grid RowDefinitions="Auto,*">
           <ComboBox Grid.Row="0" Margin="8" HorizontalAlignment="Stretch"
-                    IsVisible="{Binding HasApiServices}"
+                    IsVisible="{Binding HasApiChoice}"
                     PlaceholderText="{DynamicResource Text.AIAssistant.SelectService}"
                     ItemsSource="{Binding ApiServices}"
                     SelectedItem="{Binding SelectedApiService, Mode=TwoWay}">
@@ -111,86 +116,41 @@
       </TabItem>
       <TabItem Header="CLI">
         <Grid RowDefinitions="Auto,*">
-          <ComboBox Grid.Row="0" Margin="8" HorizontalAlignment="Stretch"
-                    IsVisible="{Binding HasCliServices}"
+          <ComboBox Margin="8" HorizontalAlignment="Stretch"
                     IsEnabled="{Binding !Cli.IsCommitting, FallbackValue=True}"
-                    PlaceholderText="{DynamicResource Text.AIAssistant.SelectService}"
                     ItemsSource="{Binding CliServices}"
                     SelectedItem="{Binding SelectedCliService, Mode=TwoWay}">
             <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="ai:Service">
+              <DataTemplate x:DataType="ai:ExternalCliProfile">
                 <TextBlock Text="{Binding Name}"/>
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>
 
-          <TextBlock Grid.Row="1" Margin="8" TextWrapping="Wrap"
-                     IsVisible="{Binding !HasCliServices}"
-                     Text="{DynamicResource Text.AIAssistant.NoCliServices}"/>
-
           <ContentControl Grid.Row="1" Content="{Binding Cli}" IsVisible="{Binding HasCliSelection}">
             <ContentControl.ContentTemplate>
               <DataTemplate x:DataType="vm:CliAssistant">
-                <Grid RowDefinitions="*,Auto">
-                  <!-- AI response -->
-                  <v:AIResponseView Grid.Row="0"
-                                    Margin="8"
-                                    BorderThickness="1"
-                                    BorderBrush="{DynamicResource Brush.Border2}"
-                                    Background="{DynamicResource Brush.Contents}"
-                                    Content="{Binding Text}"/>
-
-                  <!-- Options -->
-                  <Grid Grid.Row="1" Margin="8,0,8,8" RowDefinitions="Auto,Auto">
-                    <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
-                      <TextBlock Grid.Column="0"
-                                 Classes="group_header_label"
-                                 VerticalAlignment="Center"
-                                 Text="{DynamicResource Text.AIAssistant.BranchName}"/>
-
-                      <TextBox Grid.Column="1"
-                               Height="26"
-                               Margin="6,0,0,0"
-                               CornerRadius="3"
-                               Text="{Binding BranchName, Mode=TwoWay}"/>
-                    </Grid>
-
-                    <Grid Grid.Row="1" ColumnDefinitions="*,18,Auto,Auto,Auto">
-                      <TextBlock Grid.Column="0"
-                                 Classes="group_header_label"
-                                 VerticalAlignment="Center"
-                                 TextTrimming="CharacterEllipsis"
-                                 Text="{Binding CommandText, Mode=OneWay}"/>
-
-                      <v:LoadingIcon Grid.Column="1"
-                                     Width="14" Height="14"
-                                     IsVisible="{Binding IsGenerating}"/>
-
-                      <Button Grid.Column="2"
-                              Classes="flat"
-                              Height="28"
-                              Margin="8,0" Padding="12,0"
-                              Content="{Binding GenerateLabel, Mode=OneWay}"
-                              IsEnabled="{Binding !IsGenerating}"
-                              Click="OnGenerateClicked"/>
-
-                      <Button Grid.Column="3"
-                              Classes="flat"
-                              Height="28"
-                              Padding="12,0"
-                              Content="{DynamicResource Text.AIAssistant.Use}"
-                              IsEnabled="{Binding Response, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                              Click="OnUseClicked"/>
-
-                      <Button Grid.Column="4"
-                              Classes="flat primary"
-                              Height="28"
-                              Margin="8,0,0,0" Padding="12,0"
-                              Content="{DynamicResource Text.AIAssistant.CreateBranchAndCommit}"
-                              IsEnabled="{Binding CanCreateBranch, Mode=OneWay}"
-                              Click="OnCreateBranchAndCommitClicked"/>
-                    </Grid>
+                <Grid RowDefinitions="*,Auto,Auto">
+                  <TextBox Margin="8,0,8,8" IsReadOnly="True" AcceptsReturn="True"
+                           TextWrapping="Wrap" VerticalContentAlignment="Top"
+                           Text="{Binding Text, Mode=OneWay}"/>
+                  <Grid Grid.Row="1" Margin="8,0,8,8" ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding ShowBranchWorkflow}">
+                    <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="{DynamicResource Text.BranchWorkflow.Name}"/>
+                    <TextBox Grid.Column="1" Text="{Binding BranchName, Mode=TwoWay}" IsReadOnly="{Binding IsBranchCreated}"/>
+                    <Button Grid.Column="2" Margin="8,0,0,0" Classes="flat" Content="{Binding BranchActionLabel}"
+                            IsEnabled="{Binding CanCommitOnNewBranch}" Click="OnCreateBranchClicked"/>
                   </Grid>
+                  <StackPanel Grid.Row="2" Margin="8,0,8,8" Orientation="Horizontal" Spacing="8"
+                              HorizontalAlignment="Right" IsEnabled="{Binding !IsCommitting}">
+                    <v:LoadingIcon Width="14" Height="14" IsVisible="{Binding IsGenerating}"/>
+                    <Button Classes="flat" Content="{DynamicResource Text.DiffAnalysis.Stop}"
+                            IsVisible="{Binding IsGenerating}" Click="OnStopCliClicked"/>
+                    <Button Classes="flat" Content="{Binding GenerateLabel}"
+                            IsEnabled="{Binding !IsGenerating}" Click="OnGenerateClicked"/>
+                    <Button Classes="flat primary" Content="{DynamicResource Text.AIAssistant.Use}"
+                            IsEnabled="{Binding Response, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            Click="OnUseClicked"/>
+                  </StackPanel>
                 </Grid>
               </DataTemplate>
             </ContentControl.ContentTemplate>

@@ -805,7 +805,7 @@ namespace SourceGit.Views
             if (snapshot == null)
                 return null;
 
-            return DiffAnalysis.CreateMenu(this, service => new(diff.RepositoryPath, service, snapshot));
+            return DiffAnalysis.CreateMenu(this, diff.RepositoryPath, preferred => new(diff.RepositoryPath, snapshot, preferred));
         }
 
         private void OnTextViewPointerChanged(object sender, PointerEventArgs e)

@@ -474,6 +474,8 @@ namespace SourceGit.ViewModels
             set;
         } = [];
 
+        public AvaloniaList<AI.ExternalCliProfile> ExternalCliProfiles { get; set; } = [];
+
         public string CommitMessageRule
         {
             get => _commitMessageRule;
@@ -489,35 +491,9 @@ Output only the commit message itself. Do not output explanations, code fences o
 
         private string _commitMessageRule = DefaultCommitMessageRule;
 
-        public string GitLabApiUrl
-        {
-            get => _gitlabApiUrl;
-            set => SetProperty(ref _gitlabApiUrl, value);
-        }
+        public AvaloniaList<Models.PullRequestPublisher> PullRequestPublishers { get; set; } = [];
 
-        public string GitLabToken
-        {
-            get => _gitlabToken;
-            set => SetProperty(ref _gitlabToken, value);
-        }
-
-        private string _gitlabApiUrl = string.Empty;
-        private string _gitlabToken = string.Empty;
-
-        public string MrLastTarget
-        {
-            get => _mrLastTarget;
-            set => SetProperty(ref _mrLastTarget, value);
-        }
-
-        public string MrLastTemplate
-        {
-            get => _mrLastTemplate;
-            set => SetProperty(ref _mrLastTemplate, value);
-        }
-
-        private string _mrLastTarget = string.Empty;
-        private string _mrLastTemplate = string.Empty;
+        public AvaloniaList<Models.ReviewConnection> ReviewConnections { get; set; } = [];
 
         public double LastCheckUpdateTime
         {
@@ -685,11 +661,41 @@ Output only the commit message itself. Do not output explanations, code fences o
             try
             {
                 using var stream = File.OpenRead(path);
-                return JsonSerializer.Deserialize(stream, JsonCodeGen.Default.Preferences);
+                var preferences = JsonSerializer.Deserialize(stream, JsonCodeGen.Default.Preferences) ?? new Preferences();
+                preferences.MigrateExternalCliProfiles();
+                return preferences;
             }
             catch
             {
                 return new Preferences();
+            }
+        }
+
+        private void MigrateExternalCliProfiles()
+        {
+            OpenAIServices ??= [];
+            ExternalCliProfiles ??= [];
+            PullRequestPublishers ??= [];
+            ReviewConnections ??= [];
+            for (var i = OpenAIServices.Count - 1; i >= 0; i--)
+            {
+                var service = OpenAIServices[i];
+                if (service?.IsCliBackend != true)
+                    continue;
+
+                // The old arguments were a shell-style string. Leave the migrated profile disabled
+                // until the user reviews how it should receive input and emit output.
+                ExternalCliProfiles.Insert(0, new AI.ExternalCliProfile()
+                {
+                    Name = service.Name,
+                    Executable = service.ExecutablePath,
+                    AdditionalPrompt = service.AdditionalPrompt,
+                    LegacyArguments = service.ExtraArguments,
+                    CanAnalyze = false,
+                    CanGenerateCommit = false,
+                    ResumeGeneration = service.PersistConversation,
+                });
+                OpenAIServices.RemoveAt(i);
             }
         }
 

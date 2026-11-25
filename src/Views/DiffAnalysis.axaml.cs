@@ -5,6 +5,7 @@ using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace SourceGit.Views
 {
@@ -16,38 +17,31 @@ namespace SourceGit.Views
             InitializeComponent();
         }
 
-        internal static MenuItem CreateMenu(Control anchor, Func<AI.Service, ViewModels.DiffAnalysis> create)
+        internal static MenuItem CreateMenu(Control anchor, string path, Func<Guid, ViewModels.DiffAnalysis> create)
         {
             if (TopLevel.GetTopLevel(anchor) is not Window owner)
                 return null;
 
-            var menu = new MenuItem() { Header = App.Text("DiffAnalysis"), Icon = anchor.CreateMenuIcon("Icons.AIAssist") };
-            foreach (var service in ViewModels.Repository.GetCliServices())
+            var analysis = new MenuItem() { Header = App.Text("DiffAnalysis") };
+            analysis.Click += (_, e) =>
             {
-                var item = new MenuItem() { Header = service.Name };
-                item.Click += (_, e) =>
+                var preferred = anchor.FindAncestorOfType<Repository>()?.DataContext is ViewModels.Repository repo &&
+                    repo.FullPath == path ? repo.Settings.PreferredExternalCli : Guid.Empty;
+                var window = new DiffAnalysis() { DataContext = create(preferred) };
+                var screen = owner.Screens.ScreenFromWindow(owner) ?? owner.Screens.Primary;
+                if (screen != null)
                 {
-                    var window = new DiffAnalysis() { DataContext = create(service) };
-                    var screen = owner.Screens.ScreenFromWindow(owner) ?? owner.Screens.Primary;
-                    if (screen != null)
-                    {
-                        var availableWidth = screen.WorkingArea.Width / screen.Scaling - 24;
-                        var availableHeight = screen.WorkingArea.Height / screen.Scaling - 24;
-                        window.Width = Math.Clamp(availableWidth, window.MinWidth, window.Width);
-                        window.Height = Math.Clamp(availableHeight, window.MinHeight, window.Height);
-                    }
+                    var availableWidth = screen.WorkingArea.Width / screen.Scaling - 24;
+                    var availableHeight = screen.WorkingArea.Height / screen.Scaling - 24;
+                    window.Width = Math.Clamp(availableWidth, window.MinWidth, window.Width);
+                    window.Height = Math.Clamp(availableHeight, window.MinHeight, window.Height);
+                }
 
-                    window.Show(owner);
-                    window.Activate();
-                    e.Handled = true;
-                };
-                menu.Items.Add(item);
-            }
-
-            if (menu.Items.Count == 0)
-                menu.Items.Add(new MenuItem() { Header = App.Text("AIAssistant.NoCliServices"), IsEnabled = false });
-
-            return menu;
+                window.Show(owner);
+                window.Activate();
+                e.Handled = true;
+            };
+            return anchor.CreateAIMenu(analysis);
         }
 
         internal static void AddSelectionMenu(ContextMenu menu, Control anchor, string path,
@@ -56,19 +50,18 @@ namespace SourceGit.Views
             if (menu == null || changes.Count == 0)
                 return;
 
-            var options = changes.DistinctBy(change => change.Path, StringComparer.Ordinal).Select(createOption).ToArray();
-            AddAnalysisMenu(menu, anchor, service => new(path, service, options));
+            var options = changes.DistinctBy(static change => change.Path, StringComparer.Ordinal).Select(createOption).ToArray();
+            AddAnalysisMenu(menu, CreateMenu(anchor, path, preferred => new(path, options, preferred)));
         }
 
         internal static void AddCommitMenu(ContextMenu menu, Control anchor, string path, Models.Commit commit)
         {
-            AddAnalysisMenu(menu, anchor, service => new(path, service, commit));
+            AddAnalysisMenu(menu, CreateMenu(anchor, path, preferred => new(path, commit, preferred)));
         }
 
-        private static void AddAnalysisMenu(ContextMenu menu, Control anchor, Func<AI.Service, ViewModels.DiffAnalysis> create)
+        private static void AddAnalysisMenu(ContextMenu menu, MenuItem analysis)
         {
-            var analysis = CreateMenu(anchor, create);
-            if (analysis == null)
+            if (menu == null || analysis == null)
                 return;
 
             if (menu.Items.Count > 0)
@@ -80,7 +73,7 @@ namespace SourceGit.Views
         {
             base.OnOpened(e);
             if (DataContext is ViewModels.DiffAnalysis vm)
-                await vm.AskAsync();
+                await vm.PrepareAsync();
         }
 
         protected override void OnClosing(WindowClosingEventArgs e)
@@ -99,6 +92,15 @@ namespace SourceGit.Views
             }
         }
 
+        private async void OnConfigureClicked(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ViewModels.DiffAnalysis vm)
+            {
+                await new ExternalCliSettings().ShowDialog(this);
+                vm.RefreshProfiles();
+            }
+        }
+
         private void OnConversationScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (DataContext is not ViewModels.DiffAnalysis { IsBusy: true } ||
@@ -112,6 +114,13 @@ namespace SourceGit.Views
 
         private void OnStopClicked(object sender, RoutedEventArgs e) =>
             (DataContext as ViewModels.DiffAnalysis)?.Stop();
+
+        private async void OnCopySelectionClicked(object sender, RoutedEventArgs e)
+        {
+            var selected = ConversationScroll.GetSelectedText();
+            if (selected.Length > 0)
+                await this.CopyTextAsync(selected);
+        }
 
         private async void OnCopyMarkdownClicked(object sender, RoutedEventArgs e)
         {
