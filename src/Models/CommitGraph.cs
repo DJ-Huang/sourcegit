@@ -19,8 +19,6 @@ namespace SourceGit.Models
 
     public class CommitGraph
     {
-        public static List<Pen> Pens { get; } = [];
-
         public static void SetDefaultPens(double thickness = 2)
         {
             SetPens(s_defaultPenColors, thickness);
@@ -28,12 +26,21 @@ namespace SourceGit.Models
 
         public static void SetPens(List<Color> colors, double thickness)
         {
-            Pens.Clear();
+            var pens = new Pen[colors.Count];
+            for (var i = 0; i < colors.Count; i++)
+                pens[i] = new Pen(colors[i].ToUInt32(), thickness);
 
-            foreach (var c in colors)
-                Pens.Add(new Pen(c.ToUInt32(), thickness));
-
+            s_pens = pens;
             s_penCount = colors.Count;
+        }
+
+        public static Pen GetPen(int color)
+        {
+            var pens = s_pens;
+            if (pens.Length == 0)
+                return s_fallbackPen;
+
+            return pens[(uint)color < (uint)pens.Length ? color : 0];
         }
 
         public class Path(int color, bool isHighlighted)
@@ -420,6 +427,8 @@ namespace SourceGit.Models
         }
 
         private static int s_penCount = 0;
+        private static Pen[] s_pens = [];
+        private static readonly Pen s_fallbackPen = new Pen(Brushes.Gray, 2);
         private static readonly List<Color> s_defaultPenColors = [
             Colors.Orange,
             Colors.ForestGreen,

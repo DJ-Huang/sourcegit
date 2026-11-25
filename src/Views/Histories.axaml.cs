@@ -1653,6 +1653,18 @@ namespace SourceGit.Views
             };
             submenu.Items.Add(push);
 
+            var pin = new MenuItem();
+            pin.Header = repo.IsBranchPinned(current)
+                ? App.Text("BranchCM.Unpin", current.Name)
+                : App.Text("BranchCM.Pin", current.Name);
+            pin.Icon = this.CreateMenuIcon("Icons.Pin");
+            pin.Click += (_, e) =>
+            {
+                repo.TogglePinBranch(current);
+                e.Handled = true;
+            };
+            submenu.Items.Add(pin);
+
             var rename = new MenuItem();
             rename.Header = App.Text("BranchCM.Rename", current.Name);
             rename.Icon = this.CreateMenuIcon("Icons.Rename");
@@ -1786,6 +1798,18 @@ namespace SourceGit.Views
                 e.Handled = true;
             };
             submenu.Items.Add(push);
+
+            var pin = new MenuItem();
+            pin.Header = repo.IsBranchPinned(branch)
+                ? App.Text("BranchCM.Unpin", branch.Name)
+                : App.Text("BranchCM.Pin", branch.Name);
+            pin.Icon = this.CreateMenuIcon("Icons.Pin");
+            pin.Click += (_, e) =>
+            {
+                repo.TogglePinBranch(branch);
+                e.Handled = true;
+            };
+            submenu.Items.Add(pin);
 
             var rename = new MenuItem();
             rename.Header = App.Text("BranchCM.Rename", branch.Name);
