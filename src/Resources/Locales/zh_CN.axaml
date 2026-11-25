@@ -388,6 +388,7 @@
   <x:String x:Key="Text.DiffAnalysis.CopyTranscript" xml:space="preserve">复制完整记录</x:String>
   <x:String x:Key="Text.DiffAnalysis.Error" xml:space="preserve">分析失败：{0}</x:String>
   <x:String x:Key="Text.DiffAnalysis.FileCount" xml:space="preserve">已选 {0} 个文件</x:String>
+  <x:String x:Key="Text.DiffAnalysis.NoCommitChanges" xml:space="preserve">没有找到此提交中的变更。</x:String>
   <x:String x:Key="Text.DiffAnalysis.Question" xml:space="preserve">追问：{0}</x:String>
   <x:String x:Key="Text.DiffAnalysis.QuestionPlaceholder" xml:space="preserve">继续询问这个变更…</x:String>
   <x:String x:Key="Text.DiffAnalysis.Restarted" xml:space="preserve">已为当前变更开启新的会话。</x:String>

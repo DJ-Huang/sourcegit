@@ -384,6 +384,7 @@
   <x:String x:Key="Text.DiffAnalysis.CopyTranscript" xml:space="preserve">Copy full transcript</x:String>
   <x:String x:Key="Text.DiffAnalysis.Error" xml:space="preserve">Analysis failed: {0}</x:String>
   <x:String x:Key="Text.DiffAnalysis.FileCount" xml:space="preserve">{0} selected file(s)</x:String>
+  <x:String x:Key="Text.DiffAnalysis.NoCommitChanges" xml:space="preserve">No changes were found for this commit.</x:String>
   <x:String x:Key="Text.DiffAnalysis.Question" xml:space="preserve">Question: {0}</x:String>
   <x:String x:Key="Text.DiffAnalysis.QuestionPlaceholder" xml:space="preserve">Ask about this change…</x:String>
   <x:String x:Key="Text.DiffAnalysis.Restarted" xml:space="preserve">Started a new conversation for this change.</x:String>

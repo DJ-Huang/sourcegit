@@ -64,6 +64,12 @@ namespace SourceGit.ViewModels
             _options = options;
         }
 
+        public DiffAnalysis(string repositoryPath, AI.Service service, Models.Commit commit)
+            : this(repositoryPath, service, $"{commit.SHA[..Math.Min(10, commit.SHA.Length)]} · {commit.Subject}")
+        {
+            _commit = commit;
+        }
+
         private DiffAnalysis(string repositoryPath, AI.Service service, string subject)
         {
             _repo = repositoryPath;
@@ -85,7 +91,16 @@ namespace SourceGit.ViewModels
             AddNotice(traceStart);
             try
             {
-                _snapshot ??= await DiffAnalysisSnapshot.ReadSelectionAsync(_repo, _options, cancel.Token);
+                _snapshot ??= _commit != null
+                    ? await DiffAnalysisSnapshot.ReadCommitAsync(_repo, _commit, cancel.Token)
+                    : await DiffAnalysisSnapshot.ReadSelectionAsync(_repo, _options, cancel.Token);
+
+                if (_snapshot == null)
+                {
+                    AddNotice(App.Text("DiffAnalysis.NoCommitChanges"));
+                    return;
+                }
+
                 if (_snapshot.Truncated && !HasAnswer)
                     AddNotice(App.Text("DiffAnalysis.Truncated"));
 
@@ -203,6 +218,7 @@ namespace SourceGit.ViewModels
         private readonly string _repo;
         private readonly AI.CliAgent _agent;
         private readonly Models.DiffOption[] _options;
+        private readonly Models.Commit _commit;
         private DiffAnalysisSnapshot _snapshot;
         private CancellationTokenSource _cancel;
         private bool _hasAnswer;

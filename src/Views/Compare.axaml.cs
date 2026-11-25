@@ -296,6 +296,9 @@ namespace SourceGit.Views
                 };
 
                 menu.Items.Add(copy);
+                if (commits is [var commit])
+                    DiffAnalysis.AddCommitMenu(menu, this, vm.RepositoryPath, commit);
+
                 menu.Open(listBox);
                 e.Handled = true;
             }

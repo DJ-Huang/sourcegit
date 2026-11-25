@@ -68,6 +68,26 @@ namespace SourceGit.ViewModels
             return Format(context.Option, lines, start, end, AI.CliAgent.MaxDiffChars);
         }
 
+        internal static async Task<DiffAnalysisSnapshot> ReadCommitAsync(
+            string repo, Models.Commit commit, CancellationToken cancellation)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            var parent = commit.FirstParentToCompare;
+            var changes = await new Commands.CompareRevisions(repo, parent, commit.SHA)
+                .ReadAsync().WaitAsync(cancellation).ConfigureAwait(false);
+
+            if (changes.Count == 0)
+                return null;
+
+            var options = changes.ConvertAll(change => new Models.DiffOption(parent, commit.SHA, change)).ToArray();
+            var snapshot = await ReadSelectionAsync(repo, options, cancellation).ConfigureAwait(false);
+            return snapshot with
+            {
+                Path = $"Commit {commit.SHA} ({options.Length} changed files)",
+                Source = $"{parent} → {commit.SHA}",
+            };
+        }
+
         public static async Task<DiffAnalysisSnapshot> ReadSelectionAsync(
             string repo, Models.DiffOption[] options, CancellationToken cancellation)
         {

@@ -57,7 +57,17 @@ namespace SourceGit.Views
                 return;
 
             var options = changes.DistinctBy(change => change.Path, StringComparer.Ordinal).Select(createOption).ToArray();
-            var analysis = CreateMenu(anchor, service => new(path, service, options));
+            AddAnalysisMenu(menu, anchor, service => new(path, service, options));
+        }
+
+        internal static void AddCommitMenu(ContextMenu menu, Control anchor, string path, Models.Commit commit)
+        {
+            AddAnalysisMenu(menu, anchor, service => new(path, service, commit));
+        }
+
+        private static void AddAnalysisMenu(ContextMenu menu, Control anchor, Func<AI.Service, ViewModels.DiffAnalysis> create)
+        {
+            var analysis = CreateMenu(anchor, create);
             if (analysis == null)
                 return;
 
