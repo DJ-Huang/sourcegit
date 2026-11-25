@@ -824,6 +824,58 @@
   <x:String x:Key="Text.PruneRemote.Target" xml:space="preserve">Target:</x:String>
   <x:String x:Key="Text.PruneWorktrees" xml:space="preserve">Prune Worktrees</x:String>
   <x:String x:Key="Text.PruneWorktrees.Tip" xml:space="preserve">Prune worktree information in `$GIT_COMMON_DIR/worktrees`</x:String>
+  <x:String x:Key="Text.PublishReview" xml:space="preserve">Publish Pull/Merge Request</x:String>
+  <x:String x:Key="Text.PublishReview.Accounts" xml:space="preserve">PR/MR credentials</x:String>
+  <x:String x:Key="Text.PublishReview.AuthFailed" xml:space="preserve">The server rejected access. Check the token and repository permissions.</x:String>
+  <x:String x:Key="Text.PublishReview.Checking" xml:space="preserve">Checking the source and target refs…</x:String>
+  <x:String x:Key="Text.PublishReview.Confirm" xml:space="preserve">Push if needed and publish</x:String>
+  <x:String x:Key="Text.PublishReview.CreateMenu" xml:space="preserve">Create PR/MR…</x:String>
+  <x:String x:Key="Text.PublishReview.DefaultTarget" xml:space="preserve">Default target branch</x:String>
+  <x:String x:Key="Text.PublishReview.Description" xml:space="preserve">Description (Markdown)</x:String>
+  <x:String x:Key="Text.PublishReview.Disabled" xml:space="preserve">Disabled</x:String>
+  <x:String x:Key="Text.PublishReview.DraftFailed" xml:space="preserve">Could not generate a draft. Fetch the target remote if its commits are missing locally. {0}</x:String>
+  <x:String x:Key="Text.PublishReview.DuplicateInstance" xml:space="preserve">This server is configured for a different provider already.</x:String>
+  <x:String x:Key="Text.PublishReview.Existing" xml:space="preserve">A matching request already exists.</x:String>
+  <x:String x:Key="Text.PublishReview.Finding" xml:space="preserve">Checking for an existing request with {0}…</x:String>
+  <x:String x:Key="Text.PublishReview.GenerateDraft" xml:space="preserve">Generate PR/MR draft</x:String>
+  <x:String x:Key="Text.PublishReview.InvalidCredential" xml:space="preserve">Enter an HTTPS server and an access token.</x:String>
+  <x:String x:Key="Text.PublishReview.InvalidResult" xml:space="preserve">The publisher returned an invalid response.</x:String>
+  <x:String x:Key="Text.PublishReview.Loading" xml:space="preserve">Loading refs and remotes…</x:String>
+  <x:String x:Key="Text.PublishReview.MultipleUrls" xml:space="preserve">Choose a remote with one URL. {0} resolves to multiple URLs.</x:String>
+  <x:String x:Key="Text.PublishReview.NewPublisher" xml:space="preserve">New publisher</x:String>
+  <x:String x:Key="Text.PublishReview.NoCommits" xml:space="preserve">There are no source commits to describe.</x:String>
+  <x:String x:Key="Text.PublishReview.NoTargets" xml:space="preserve">There are no target branches on this remote.</x:String>
+  <x:String x:Key="Text.PublishReview.Open" xml:space="preserve">Open published request</x:String>
+  <x:String x:Key="Text.PublishReview.Published" xml:space="preserve">The request was published.</x:String>
+  <x:String x:Key="Text.PublishReview.PublisherHelp" xml:space="preserve">Configure a trusted command that reads a publication request on stdin. The command uses its own sign-in and prints a JSON result.</x:String>
+  <x:String x:Key="Text.PublishReview.PublisherLabel" xml:space="preserve">Publisher</x:String>
+  <x:String x:Key="Text.PublishReview.Publishers" xml:space="preserve">PR/MR Publishers</x:String>
+  <x:String x:Key="Text.PublishReview.Publishing" xml:space="preserve">Publishing with {0}…</x:String>
+  <x:String x:Key="Text.PublishReview.PushFailed" xml:space="preserve">Push to {0} failed. Resolve the Git error and try again.</x:String>
+  <x:String x:Key="Text.PublishReview.PushRemote" xml:space="preserve">Source remote</x:String>
+  <x:String x:Key="Text.PublishReview.Pushing" xml:space="preserve">Pushing {0} to {1}…</x:String>
+  <x:String x:Key="Text.PublishReview.Ready" xml:space="preserve">Review the branches, title and description before publishing.</x:String>
+  <x:String x:Key="Text.PublishReview.Refresh" xml:space="preserve">Refresh refs</x:String>
+  <x:String x:Key="Text.PublishReview.RemoteReadFailed" xml:space="preserve">Could not read branch refs from {0}. Check the remote and authentication.</x:String>
+  <x:String x:Key="Text.PublishReview.RepositoryHelp" xml:space="preserve">Select remote and branch defaults. SourceGit uses the token configured for the selected target instance.</x:String>
+  <x:String x:Key="Text.PublishReview.RequestFailed" xml:space="preserve">The server returned HTTP {0}.</x:String>
+  <x:String x:Key="Text.PublishReview.ReviewCredentials" xml:space="preserve">Set access token</x:String>
+  <x:String x:Key="Text.PublishReview.SameBranch" xml:space="preserve">Select a different target. Both refs point to the same project branch.</x:String>
+  <x:String x:Key="Text.PublishReview.SameInstance" xml:space="preserve">Choose source and target remotes on the same hosting instance.</x:String>
+  <x:String x:Key="Text.PublishReview.SelectTarget" xml:space="preserve">Select target branch</x:String>
+  <x:String x:Key="Text.PublishReview.Server" xml:space="preserve">Server (HTTPS)</x:String>
+  <x:String x:Key="Text.PublishReview.Source" xml:space="preserve">Source remote and branch</x:String>
+  <x:String x:Key="Text.PublishReview.Stale" xml:space="preserve">A remote address or branch tip changed. Refresh the preview and review the request again.</x:String>
+  <x:String x:Key="Text.PublishReview.StoreFailed" xml:space="preserve">Could not save the token to the system keychain.</x:String>
+  <x:String x:Key="Text.PublishReview.StoreHelp" xml:space="preserve">SourceGit stores tokens in the system keychain and matches them to the target remote.</x:String>
+  <x:String x:Key="Text.PublishReview.Target" xml:space="preserve">Target remote and branch</x:String>
+  <x:String x:Key="Text.PublishReview.TargetRemote" xml:space="preserve">Target remote</x:String>
+  <x:String x:Key="Text.PublishReview.Template" xml:space="preserve">Description template</x:String>
+  <x:String x:Key="Text.PublishReview.Title" xml:space="preserve">Title</x:String>
+  <x:String x:Key="Text.PublishReview.Token" xml:space="preserve">Access token</x:String>
+  <x:String x:Key="Text.PublishReview.TokenRequired" xml:space="preserve">Set an access token for the selected remote to create the request.</x:String>
+  <x:String x:Key="Text.PublishReview.TooManyResults" xml:space="preserve">Too many matching requests to verify safely.</x:String>
+  <x:String x:Key="Text.PublishReview.Unconfirmed" xml:space="preserve">The publisher could not confirm creation. Retry to look for an existing request first. {0}</x:String>
   <x:String x:Key="Text.Pull" xml:space="preserve">Pull</x:String>
   <x:String x:Key="Text.Pull.Branch" xml:space="preserve">Remote Branch:</x:String>
   <x:String x:Key="Text.Pull.Into" xml:space="preserve">Into:</x:String>

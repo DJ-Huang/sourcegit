@@ -828,6 +828,58 @@
   <x:String x:Key="Text.PruneRemote.Target" xml:space="preserve">目标 ：</x:String>
   <x:String x:Key="Text.PruneWorktrees" xml:space="preserve">清理工作树</x:String>
   <x:String x:Key="Text.PruneWorktrees.Tip" xml:space="preserve">清理在`$GIT_COMMON_DIR/worktrees`中的无效工作树信息</x:String>
+  <x:String x:Key="Text.PublishReview" xml:space="preserve">发布 PR/MR</x:String>
+  <x:String x:Key="Text.PublishReview.Accounts" xml:space="preserve">PR/MR 凭据</x:String>
+  <x:String x:Key="Text.PublishReview.AuthFailed" xml:space="preserve">服务器拒绝访问。请检查令牌和仓库权限。</x:String>
+  <x:String x:Key="Text.PublishReview.Checking" xml:space="preserve">正在检查源分支和目标分支…</x:String>
+  <x:String x:Key="Text.PublishReview.Confirm" xml:space="preserve">按需推送并发布</x:String>
+  <x:String x:Key="Text.PublishReview.CreateMenu" xml:space="preserve">创建 PR/MR…</x:String>
+  <x:String x:Key="Text.PublishReview.DefaultTarget" xml:space="preserve">默认目标分支</x:String>
+  <x:String x:Key="Text.PublishReview.Description" xml:space="preserve">描述（Markdown）</x:String>
+  <x:String x:Key="Text.PublishReview.Disabled" xml:space="preserve">停用</x:String>
+  <x:String x:Key="Text.PublishReview.DraftFailed" xml:space="preserve">无法生成草稿。如果本地缺少目标提交，请先获取目标远端。{0}</x:String>
+  <x:String x:Key="Text.PublishReview.DuplicateInstance" xml:space="preserve">此实例已配置为另一种托管平台。</x:String>
+  <x:String x:Key="Text.PublishReview.Existing" xml:space="preserve">已找到对应的 PR/MR。</x:String>
+  <x:String x:Key="Text.PublishReview.Finding" xml:space="preserve">正在用 {0} 检查是否已有 PR/MR…</x:String>
+  <x:String x:Key="Text.PublishReview.GenerateDraft" xml:space="preserve">生成 PR/MR 草稿</x:String>
+  <x:String x:Key="Text.PublishReview.InvalidCredential" xml:space="preserve">请输入 HTTPS 实例地址和访问令牌。</x:String>
+  <x:String x:Key="Text.PublishReview.InvalidResult" xml:space="preserve">发布命令返回了无效结果。</x:String>
+  <x:String x:Key="Text.PublishReview.Loading" xml:space="preserve">正在读取分支和远端…</x:String>
+  <x:String x:Key="Text.PublishReview.MultipleUrls" xml:space="preserve">请选择只有一个 URL 的远端。{0} 对应多个 URL。</x:String>
+  <x:String x:Key="Text.PublishReview.NewPublisher" xml:space="preserve">新发布命令</x:String>
+  <x:String x:Key="Text.PublishReview.NoCommits" xml:space="preserve">源分支没有可用于草稿的新增提交。</x:String>
+  <x:String x:Key="Text.PublishReview.NoTargets" xml:space="preserve">该远端没有目标分支。</x:String>
+  <x:String x:Key="Text.PublishReview.Open" xml:space="preserve">打开 PR/MR</x:String>
+  <x:String x:Key="Text.PublishReview.Published" xml:space="preserve">PR/MR 已发布。</x:String>
+  <x:String x:Key="Text.PublishReview.PublisherHelp" xml:space="preserve">请配置可信的发布命令。它从标准输入读取发布请求，使用自己的登录状态，并输出 JSON 结果。</x:String>
+  <x:String x:Key="Text.PublishReview.PublisherLabel" xml:space="preserve">发布命令</x:String>
+  <x:String x:Key="Text.PublishReview.Publishers" xml:space="preserve">PR/MR 发布命令</x:String>
+  <x:String x:Key="Text.PublishReview.Publishing" xml:space="preserve">正在用 {0} 发布…</x:String>
+  <x:String x:Key="Text.PublishReview.PushFailed" xml:space="preserve">推送到 {0} 失败。请处理 Git 错误后重试。</x:String>
+  <x:String x:Key="Text.PublishReview.PushRemote" xml:space="preserve">推送远端</x:String>
+  <x:String x:Key="Text.PublishReview.Pushing" xml:space="preserve">正在推送 {0} 到 {1}…</x:String>
+  <x:String x:Key="Text.PublishReview.Ready" xml:space="preserve">发布前请确认分支、标题和描述。</x:String>
+  <x:String x:Key="Text.PublishReview.Refresh" xml:space="preserve">刷新分支</x:String>
+  <x:String x:Key="Text.PublishReview.RemoteReadFailed" xml:space="preserve">无法读取 {0} 的分支。请检查远端和认证。</x:String>
+  <x:String x:Key="Text.PublishReview.RepositoryHelp" xml:space="preserve">设置远端和分支的默认值。SourceGit 自动使用目标实例的令牌。</x:String>
+  <x:String x:Key="Text.PublishReview.RequestFailed" xml:space="preserve">服务端返回 HTTP {0}。</x:String>
+  <x:String x:Key="Text.PublishReview.ReviewCredentials" xml:space="preserve">配置访问令牌</x:String>
+  <x:String x:Key="Text.PublishReview.SameBranch" xml:space="preserve">请选择其他目标。源分支和目标分支指向同一项目分支。</x:String>
+  <x:String x:Key="Text.PublishReview.SameInstance" xml:space="preserve">请选择同一个实例上的推送远端和目标远端。</x:String>
+  <x:String x:Key="Text.PublishReview.SelectTarget" xml:space="preserve">选择目标分支</x:String>
+  <x:String x:Key="Text.PublishReview.Server" xml:space="preserve">实例地址（HTTPS）</x:String>
+  <x:String x:Key="Text.PublishReview.Source" xml:space="preserve">源远端和分支</x:String>
+  <x:String x:Key="Text.PublishReview.Stale" xml:space="preserve">远端地址或分支指向已更改。请刷新预览并重新确认。</x:String>
+  <x:String x:Key="Text.PublishReview.StoreFailed" xml:space="preserve">无法更新系统凭据库中的令牌。</x:String>
+  <x:String x:Key="Text.PublishReview.StoreHelp" xml:space="preserve">令牌存入系统凭据库。SourceGit 根据目标远端自动匹配凭据。</x:String>
+  <x:String x:Key="Text.PublishReview.Target" xml:space="preserve">目标远端和分支</x:String>
+  <x:String x:Key="Text.PublishReview.TargetRemote" xml:space="preserve">目标远端</x:String>
+  <x:String x:Key="Text.PublishReview.Template" xml:space="preserve">描述模板</x:String>
+  <x:String x:Key="Text.PublishReview.Title" xml:space="preserve">标题</x:String>
+  <x:String x:Key="Text.PublishReview.Token" xml:space="preserve">访问令牌</x:String>
+  <x:String x:Key="Text.PublishReview.TokenRequired" xml:space="preserve">请为目标远端对应的实例配置令牌。</x:String>
+  <x:String x:Key="Text.PublishReview.TooManyResults" xml:space="preserve">符合条件的请求过多，无法确认是否已存在。</x:String>
+  <x:String x:Key="Text.PublishReview.Unconfirmed" xml:space="preserve">发布命令无法确认是否创建成功。重试时会先查找已有请求。{0}</x:String>
   <x:String x:Key="Text.Pull" xml:space="preserve">拉回(pull)</x:String>
   <x:String x:Key="Text.Pull.Branch" xml:space="preserve">拉取分支 ：</x:String>
   <x:String x:Key="Text.Pull.Into" xml:space="preserve">本地分支 ：</x:String>

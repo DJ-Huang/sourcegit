@@ -491,6 +491,10 @@ Output only the commit message itself. Do not output explanations, code fences o
 
         private string _commitMessageRule = DefaultCommitMessageRule;
 
+        public AvaloniaList<Models.PullRequestPublisher> PullRequestPublishers { get; set; } = [];
+
+        public AvaloniaList<Models.ReviewConnection> ReviewConnections { get; set; } = [];
+
         public double LastCheckUpdateTime
         {
             get => _lastCheckUpdateTime;
@@ -671,6 +675,8 @@ Output only the commit message itself. Do not output explanations, code fences o
         {
             OpenAIServices ??= [];
             ExternalCliProfiles ??= [];
+            PullRequestPublishers ??= [];
+            ReviewConnections ??= [];
             for (var i = OpenAIServices.Count - 1; i >= 0; i--)
             {
                 var service = OpenAIServices[i];

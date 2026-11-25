@@ -23,6 +23,7 @@ namespace SourceGit.AI
         public int TimeoutSeconds { get; set; } = 300;
         public bool CanGenerateCommit { get; set; } = true;
         public bool CanAnalyze { get; set; } = true;
+        public bool CanDraftPullRequest { get; set; }
         public bool UsePromptFile { get; set; }
         public bool StructuredOutput { get; set; }
         public bool ResumeGeneration { get; set; }

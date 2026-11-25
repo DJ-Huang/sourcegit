@@ -13,6 +13,7 @@ namespace SourceGit.AI
     {
         CommitMessage,
         DiffAnalysis,
+        PullRequestDraft,
     }
 
     internal readonly record struct ExternalCliEvent(string Type, string Label, string Payload, string Thinking = null, bool ContinuesThinking = false);

@@ -52,6 +52,8 @@ namespace SourceGit.Models
 
         public string BranchNameTemplate { get; set; } = "{type}/{slug}";
 
+        public PullRequestWorkflow PullRequestWorkflow { get; set; } = new();
+
         public AvaloniaList<CommitTemplate> CommitTemplates
         {
             get;

@@ -428,6 +428,30 @@ namespace SourceGit.Views
             await new ExternalCliSettings().ShowDialog(this);
         }
 
+        private async void OnEditReviewCredential(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            var selected = ReviewConnectionsList.SelectedItem as Models.ReviewConnection;
+            await new EditReviewCredential(selected?.Server, selected?.IsGitHub == true).ShowDialog<bool>(this);
+        }
+
+        private async void OnRemoveGitLabCredential(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (ReviewConnectionsList.SelectedItem is not Models.ReviewConnection connection)
+                return;
+
+            try
+            {
+                Models.ReviewCredentials.Remove(connection);
+                ViewModels.Preferences.Instance.ReviewConnections.Remove(connection);
+            }
+            catch (Exception)
+            {
+                await new Alert().ShowAsync(this, App.Text("PublishReview.StoreFailed"), true);
+            }
+        }
+
         private void OnAddOpenAIService(object sender, RoutedEventArgs e)
         {
             var service = new AI.Service() { Name = "Unnamed Service" };

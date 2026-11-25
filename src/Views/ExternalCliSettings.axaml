@@ -61,6 +61,7 @@
                     <CheckBox Content="{DynamicResource Text.ExternalCLI.Commit}" IsChecked="{Binding CanGenerateCommit, Mode=TwoWay}"/>
                     <CheckBox Margin="12,0,0,0" Content="{DynamicResource Text.DiffAnalysis}" IsChecked="{Binding CanAnalyze, Mode=TwoWay}"/>
                   </WrapPanel>
+                  <CheckBox Content="{DynamicResource Text.PublishReview.GenerateDraft}" IsChecked="{Binding CanDraftPullRequest, Mode=TwoWay}"/>
                   <CheckBox Content="{DynamicResource Text.ExternalCLI.PromptFile}" IsChecked="{Binding UsePromptFile, Mode=TwoWay}"/>
                   <CheckBox Content="{DynamicResource Text.ExternalCLI.StructuredOutput}" IsChecked="{Binding StructuredOutput, Mode=TwoWay}"/>
                   <TextBlock Text="{DynamicResource Text.ExternalCLI.ResumeArguments}"/>

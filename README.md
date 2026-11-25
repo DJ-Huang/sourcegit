@@ -207,6 +207,8 @@ For other AI service:
 Configure an external command under **Preferences → AI → External CLI profiles** to generate a commit subject or analyze changes.
 See [External AI commands](docs/external-ai.md) for input modes, example profiles, and the optional JSONL protocol.
 
+See [Publishing pull and merge requests](docs/publishing-reviews.md) for the optional publishing workflow.
+
 ## External Tools
 
 This app supports open repository in external tools listed in the table below.

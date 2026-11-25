@@ -979,6 +979,23 @@
           </Grid>
         </TabItem>
 
+        <TabItem>
+          <TabItem.Header>
+            <TextBlock Classes="tab_header" Text="{DynamicResource Text.PublishReview.Accounts}"/>
+          </TabItem.Header>
+          <Grid Margin="8" RowDefinitions="Auto,*,Auto">
+            <TextBlock Text="{DynamicResource Text.PublishReview.StoreHelp}" TextWrapping="Wrap"/>
+            <ListBox Grid.Row="1" x:Name="ReviewConnectionsList" Margin="0,8" ItemsSource="{Binding ReviewConnections}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="m:ReviewConnection"><TextBlock Text="{Binding Label}"/></DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+              <Button Classes="flat" Content="{DynamicResource Text.PublishReview.ReviewCredentials}" Click="OnEditReviewCredential"/>
+              <Button Classes="flat" Content="{DynamicResource Text.ExternalCLI.Remove}" Click="OnRemoveGitLabCredential"/>
+            </StackPanel>
+          </Grid>
+        </TabItem>
       </TabControl>
     </Border>
   </Grid>
