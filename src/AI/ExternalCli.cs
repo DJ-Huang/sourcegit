@@ -30,7 +30,6 @@ namespace SourceGit.AI
                 .. ExternalCliProfile.ExpandChatArguments(profile.ChatEfforts, profile.ChatEffortArguments, ExternalCliProfile.ChatEffortToken, chatEffort),
             ];
             _resumeArguments = ExternalCliProfile.ReadArguments(profile.ResumeArguments);
-            _timeout = Math.Clamp(profile.TimeoutSeconds, 1, 1800);
             _usePromptFile = profile.UsePromptFile;
             _structured = profile.StructuredOutput;
             _resumeGeneration = profile.ResumeGeneration;
@@ -111,7 +110,7 @@ namespace SourceGit.AI
                 }
 
                 var events = _structured ? new Events(emit) : null;
-                var result = await Commands.ExternalProcess.RunAsync(start, _usePromptFile ? null : prompt, MaxOutputChars, _timeout,
+                var result = await Commands.ExternalProcess.RunAsync(start, _usePromptFile ? null : prompt, MaxOutputChars, timeoutSeconds: null,
                     cancellation, events == null ? null : events.Consume).ConfigureAwait(false);
                 if (result.StdOut.Truncated)
                     throw new InvalidOperationException(App.Text("ExternalCLI.OutputLimit"));
@@ -204,7 +203,6 @@ namespace SourceGit.AI
 
         private static async Task<FileStream> LockAsync(string path, CancellationToken cancellation)
         {
-            var deadline = Environment.TickCount64 + 300_000;
             while (true)
             {
                 cancellation.ThrowIfCancellationRequested();
@@ -215,8 +213,6 @@ namespace SourceGit.AI
                 }
                 catch (IOException e) when ((e.HResult & 0xffff) is 11 or 32 or 33)
                 {
-                    if (Environment.TickCount64 >= deadline)
-                        throw new TimeoutException(App.Text("ExternalCLI.SessionBusy"));
                     await Task.Delay(100, cancellation).ConfigureAwait(false);
                 }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException)
@@ -277,7 +273,6 @@ namespace SourceGit.AI
         private readonly string _executable;
         private readonly string[] _arguments;
         private readonly string[] _resumeArguments;
-        private readonly int _timeout;
         private readonly bool _usePromptFile;
         private readonly bool _structured;
         private readonly bool _resumeGeneration;

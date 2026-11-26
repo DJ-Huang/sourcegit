@@ -532,10 +532,8 @@
   <x:String x:Key="Text.ExternalCLI.Remove" xml:space="preserve">Remove profile</x:String>
   <x:String x:Key="Text.ExternalCLI.ResumeArguments" xml:space="preserve">Resume arguments (optional, one per line, include {sessionId})</x:String>
   <x:String x:Key="Text.ExternalCLI.ResumeGeneration" xml:space="preserve">Resume generation conversations</x:String>
-  <x:String x:Key="Text.ExternalCLI.SessionBusy" xml:space="preserve">This CLI session is still in use.</x:String>
   <x:String x:Key="Text.ExternalCLI.StartError" xml:space="preserve">Could not start the command. {0}</x:String>
   <x:String x:Key="Text.ExternalCLI.StructuredOutput" xml:space="preserve">Read SourceGit JSONL output</x:String>
-  <x:String x:Key="Text.ExternalCLI.Timeout" xml:space="preserve">Timeout (seconds)</x:String>
   <x:String x:Key="Text.ExternalCLI.TimeoutError" xml:space="preserve">The command timed out after {0} seconds.</x:String>
   <x:String x:Key="Text.Fetch" xml:space="preserve">Fetch</x:String>
   <x:String x:Key="Text.Fetch.AllRemotes" xml:space="preserve">Fetch all remotes</x:String>

@@ -60,6 +60,8 @@ Open the sidebar with the **AI Chat** button on the right of the repository tool
 
 Open **AI Chat model and effort** in an external CLI profile to configure the optional composer selectors. Enter the supported model IDs or effort values one per line. Add the matching argument template, such as `--model={model}` or `--reasoning_effort={effort}` for supported Codely models. Each argument line is passed separately. **CLI default** omits the corresponding override. SourceGit remembers the choices per chat and resumes CLI sessions for the same effective command arguments. These selectors apply to chat requests.
 
+Sending moves the draft and its pending attachments into the conversation and clears the composer. SourceGit waits for the external AI command to finish. If the CLI reports an error or you click **Stop**, the draft and its attachments return to the composer.
+
 ## Create a branch and commit
 
 In **Repository configuration → AI**, set the branch-name template. The default is `{type}/{slug}`. Generate a subject from the working-copy AI toolbar and review the branch name. **Create branch and commit** shows the branch, subject and staged file count before it writes to Git. If a hook rejects the commit, review the Git log and continue the commit on the new branch.

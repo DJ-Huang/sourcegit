@@ -536,10 +536,8 @@
   <x:String x:Key="Text.ExternalCLI.Remove" xml:space="preserve">移除配置</x:String>
   <x:String x:Key="Text.ExternalCLI.ResumeArguments" xml:space="preserve">会话续接参数（可选，每行一个，包含 {sessionId}）</x:String>
   <x:String x:Key="Text.ExternalCLI.ResumeGeneration" xml:space="preserve">延续生成对话</x:String>
-  <x:String x:Key="Text.ExternalCLI.SessionBusy" xml:space="preserve">此 CLI 会话仍在运行。</x:String>
   <x:String x:Key="Text.ExternalCLI.StartError" xml:space="preserve">无法启动命令。{0}</x:String>
   <x:String x:Key="Text.ExternalCLI.StructuredOutput" xml:space="preserve">读取 SourceGit JSONL 输出</x:String>
-  <x:String x:Key="Text.ExternalCLI.Timeout" xml:space="preserve">超时（秒）</x:String>
   <x:String x:Key="Text.ExternalCLI.TimeoutError" xml:space="preserve">命令在 {0} 秒后超时。</x:String>
   <x:String x:Key="Text.Fetch" xml:space="preserve">拉取(fetch)</x:String>
   <x:String x:Key="Text.Fetch.AllRemotes" xml:space="preserve">拉取所有的远程仓库</x:String>

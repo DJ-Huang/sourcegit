@@ -29,8 +29,8 @@ namespace SourceGit.ViewModels
         public string Title => _current.DisplayTitle;
         public List<Models.AIChatThread> History => _threads.Where(chat => chat.DisplayTitle.Contains(Filter, StringComparison.CurrentCultureIgnoreCase))
             .OrderByDescending(static chat => chat.LastOpened).ToList();
-        public Models.AIChatAttachment[] Pending => [.. _current.Pending];
-        public bool HasPending => _current.Pending.Count > 0;
+        public Models.AIChatAttachment[] Pending => IsSending ? [] : [.. _current.Pending];
+        public bool HasPending => !IsSending && _current.Pending.Count > 0;
         public string PendingLabel => App.Text("AIChat.Pending", _current.Pending.Count);
         public bool HasPreview => Preview != null;
 
@@ -81,10 +81,10 @@ namespace SourceGit.ViewModels
 
         public string Draft
         {
-            get => _current.Draft;
+            get => IsSending ? string.Empty : _current.Draft;
             set
             {
-                if (_current.Draft == value)
+                if (IsSending || _current.Draft == value)
                     return;
                 _current.Draft = value ?? string.Empty;
                 ScheduleSave();
@@ -289,6 +289,8 @@ namespace SourceGit.ViewModels
             var outgoing = new DiffAnalysisEntry(new("question", null, question), attachments);
             using var cancellation = new CancellationTokenSource();
             Begin(cancellation, true, "AIChat.Running");
+            Preview = null;
+            UpdateComposer();
             AppendEntry(outgoing);
             try
             {
@@ -311,9 +313,7 @@ namespace SourceGit.ViewModels
                 _current.Draft = string.Empty;
                 Preview = null;
                 Status = string.Empty;
-                UpdatePending();
                 OnPropertyChanged(nameof(Title));
-                OnPropertyChanged(nameof(Draft));
                 SaveCurrent();
             }
             catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
@@ -333,6 +333,7 @@ namespace SourceGit.ViewModels
                 FlushTrace();
                 OnPropertyChanged(nameof(HasEntries));
                 End();
+                UpdateComposer();
             }
         }
 
@@ -425,6 +426,12 @@ namespace SourceGit.ViewModels
             OnPropertyChanged(nameof(CanSend));
         }
 
+        private void UpdateComposer()
+        {
+            OnPropertyChanged(nameof(Draft));
+            UpdatePending();
+        }
+
         private void UpdateActions()
         {
             OnPropertyChanged(nameof(IsBusy));
@@ -444,7 +451,7 @@ namespace SourceGit.ViewModels
             _saveTimer.Stop();
             if (!_threads.Contains(_current))
             {
-                if (_current.Turns.Count == 0 && !HasPending && string.IsNullOrWhiteSpace(Draft))
+                if (_current.Turns.Count == 0 && _current.Pending.Count == 0 && string.IsNullOrWhiteSpace(_current.Draft))
                     return;
                 _threads.Add(_current);
             }
