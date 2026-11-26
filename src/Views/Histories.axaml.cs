@@ -1597,6 +1597,7 @@ namespace SourceGit.Views
                 e.Handled = true;
             };
             submenu.Items.Add(push);
+            PublishPullRequest.AddMenu(this, submenu.Items, repo, current);
 
             var pin = new MenuItem();
             pin.Header = repo.IsBranchPinned(current)
@@ -1743,6 +1744,7 @@ namespace SourceGit.Views
                 e.Handled = true;
             };
             submenu.Items.Add(push);
+            PublishPullRequest.AddMenu(this, submenu.Items, repo, branch);
 
             var pin = new MenuItem();
             pin.Header = repo.IsBranchPinned(branch)
