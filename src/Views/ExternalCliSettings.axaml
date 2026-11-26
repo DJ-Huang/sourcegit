@@ -89,8 +89,6 @@
                     </StackPanel>
                   </Expander>
                   <CheckBox Content="{DynamicResource Text.ExternalCLI.ResumeGeneration}" IsChecked="{Binding ResumeGeneration, Mode=TwoWay}"/>
-                  <TextBlock Text="{DynamicResource Text.ExternalCLI.Timeout}"/>
-                  <NumericUpDown Minimum="1" Maximum="1800" Value="{Binding TimeoutSeconds, Mode=TwoWay}"/>
                   <TextBlock Text="{DynamicResource Text.Preferences.AI.AdditionalPrompt}"/>
                   <TextBox Text="{Binding AdditionalPrompt, Mode=TwoWay}" MinHeight="62" AcceptsReturn="True"
                            TextWrapping="Wrap" VerticalContentAlignment="Top"/>

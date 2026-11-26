@@ -24,7 +24,6 @@ namespace SourceGit.AI
         public string ChatEfforts { get; set; } = string.Empty;
         public string ChatEffortArguments { get; set; } = string.Empty;
         public string AdditionalPrompt { get; set; } = string.Empty;
-        public int TimeoutSeconds { get; set; } = 300;
         public bool CanGenerateCommit { get; set; } = true;
         public bool CanAnalyze { get; set; } = true;
         public bool CanDraftPullRequest { get; set; }
