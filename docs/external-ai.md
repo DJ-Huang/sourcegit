@@ -54,7 +54,9 @@ The same app settings work with another vendor or a local backend by configuring
 
 Open the AI helper from the commit toolbar to generate a subject for all staged changes. From a selection in the staged file list, the helper generates from those files. Apply the returned subject to the commit editor.
 
-To analyze a commit, a file selection, or a text diff, open its context menu and choose **AI → Analysis**. Select a CLI profile at the top of the window and click **Start analysis**. The window captures the change when you open it and reuses that snapshot and the selected CLI for follow-up questions. Expand tool or provider reasoning output when available. Drag across the analysis to select multiple paragraphs and code blocks, then use the clipboard shortcut or the Copy menu.
+Right-click a commit, selected files, or a text diff and choose **AI → Add to AI Chat**. The context appears in the right sidebar and can be previewed or removed before you send it. Choose **AI → Analysis** to start a conversation with the selected changes and a suggested question. An independent window hosts the same chat when the repository view is too narrow.
+
+Select a CLI, enter a question, and click **Send**. A chat uses the frozen snapshots for follow-up questions. **History** reopens locally saved conversations and drafts for this worktree. SourceGit stores history in its application configuration directory. Tool and reasoning output can be expanded during the session. Drag across the analysis to select multiple paragraphs or code blocks, then use the clipboard shortcut or the Copy menu.
 
 ## Create a branch and commit
 

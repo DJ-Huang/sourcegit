@@ -386,6 +386,34 @@
   <x:String x:Key="Text.DeleteTag" xml:space="preserve">Delete Tag</x:String>
   <x:String x:Key="Text.DeleteTag.Tag" xml:space="preserve">Tag:</x:String>
   <x:String x:Key="Text.DeleteTag.WithRemote" xml:space="preserve">Delete from remote repositories</x:String>
+  <x:String x:Key="Text.AIChat" xml:space="preserve">AI Chat</x:String>
+  <x:String x:Key="Text.AIChat.Added" xml:space="preserve">Added {0} context item(s).</x:String>
+  <x:String x:Key="Text.AIChat.AlreadyAdded" xml:space="preserve">Already attached to this draft.</x:String>
+  <x:String x:Key="Text.AIChat.Attach" xml:space="preserve">Add to AI Chat</x:String>
+  <x:String x:Key="Text.AIChat.AttachmentLimit" xml:space="preserve">The draft reached its context limit.</x:String>
+  <x:String x:Key="Text.AIChat.Busy" xml:space="preserve">Wait for the current request or stop it first.</x:String>
+  <x:String x:Key="Text.AIChat.CaptureFailed" xml:space="preserve">Could not read the selected changes. {0}</x:String>
+  <x:String x:Key="Text.AIChat.Capturing" xml:space="preserve">Capturing the selected changes…</x:String>
+  <x:String x:Key="Text.AIChat.ClosePreview" xml:space="preserve">Close snapshot preview</x:String>
+  <x:String x:Key="Text.AIChat.DefaultQuestion" xml:space="preserve">Analyze the impact of these changes.</x:String>
+  <x:String x:Key="Text.AIChat.Draft" xml:space="preserve">Ask about the selected changes…</x:String>
+  <x:String x:Key="Text.AIChat.DraftKept" xml:space="preserve">Draft and context kept.</x:String>
+  <x:String x:Key="Text.AIChat.Empty" xml:space="preserve">Right-click a change or a commit and choose AI → Add to AI Chat.</x:String>
+  <x:String x:Key="Text.AIChat.Hide" xml:space="preserve">Close AI Chat panel</x:String>
+  <x:String x:Key="Text.AIChat.History" xml:space="preserve">History</x:String>
+  <x:String x:Key="Text.AIChat.LoadFailed" xml:space="preserve">Some local conversations could not be loaded.</x:String>
+  <x:String x:Key="Text.AIChat.New" xml:space="preserve">New chat</x:String>
+  <x:String x:Key="Text.AIChat.Pending" xml:space="preserve">Pending context · {0}</x:String>
+  <x:String x:Key="Text.AIChat.Remove" xml:space="preserve">Remove attachment</x:String>
+  <x:String x:Key="Text.AIChat.Running" xml:space="preserve">Analyzing changes…</x:String>
+  <x:String x:Key="Text.AIChat.SaveFailed" xml:space="preserve">Could not save this conversation locally.</x:String>
+  <x:String x:Key="Text.AIChat.Search" xml:space="preserve">Search this worktree’s conversations</x:String>
+  <x:String x:Key="Text.AIChat.Send" xml:space="preserve">Send</x:String>
+  <x:String x:Key="Text.AIChat.SendShortcut" xml:space="preserve">Enter to send · Shift+Enter for a new line</x:String>
+  <x:String x:Key="Text.AIChat.Source.Commit" xml:space="preserve">Commit</x:String>
+  <x:String x:Key="Text.AIChat.Source.Revision" xml:space="preserve">Revision diff</x:String>
+  <x:String x:Key="Text.AIChat.Source.Staged" xml:space="preserve">Staged</x:String>
+  <x:String x:Key="Text.AIChat.Source.Unstaged" xml:space="preserve">Unstaged</x:String>
   <x:String x:Key="Text.DiffAnalysis" xml:space="preserve">Analysis</x:String>
   <x:String x:Key="Text.DiffAnalysis.Ask" xml:space="preserve">Ask</x:String>
   <x:String x:Key="Text.DiffAnalysis.CopySelection" xml:space="preserve">Copy selection</x:String>
