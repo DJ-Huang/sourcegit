@@ -46,6 +46,12 @@ namespace SourceGit.Views
                 AttachmentClicked?.Invoke(attachment);
         }
 
+        private async void OnCopyReply(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button { DataContext: ViewModels.DiffAnalysisEntry { AnswerMarkdown.Length: > 0 } reply })
+                await this.CopyTextAsync(reply.AnswerMarkdown);
+        }
+
         protected override void OnPointerMoved(PointerEventArgs e)
         {
             base.OnPointerMoved(e);

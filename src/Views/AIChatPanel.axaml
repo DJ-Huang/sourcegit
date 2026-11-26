@@ -14,7 +14,7 @@
           <TextBlock Classes="bold" Text="{DynamicResource Text.AIChat}"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-          <Button x:Name="HistoryButton" Classes="flat" Padding="6,2" Content="{DynamicResource Text.AIChat.History}" IsEnabled="{Binding !IsBusy}">
+          <Button x:Name="HistoryButton" Classes="flat" Height="22" Padding="6,0" Content="{DynamicResource Text.AIChat.History}" IsEnabled="{Binding !IsBusy}">
             <Button.Flyout>
               <Flyout Placement="Bottom" ShowMode="Standard">
                 <StackPanel Width="262" Spacing="6">
@@ -33,11 +33,13 @@
               </Flyout>
             </Button.Flyout>
           </Button>
-          <Button Classes="flat" Width="24" Padding="0" Content="+" FontSize="16" Click="OnNewChat"
-                  ToolTip.Tip="{DynamicResource Text.AIChat.New}" AutomationProperties.Name="{DynamicResource Text.AIChat.New}" IsEnabled="{Binding !IsBusy}"/>
-          <Button Classes="flat" Width="24" Padding="0" Click="OnHide" ToolTip.Tip="{DynamicResource Text.AIChat.Hide}"
-                  AutomationProperties.Name="{DynamicResource Text.AIChat.Hide}">
-            <Path Width="9" Height="9" Stretch="Uniform" Data="{StaticResource Icons.Close}"/>
+          <Button Classes="flat" Width="22" Height="22" Padding="0" Click="OnNewChat"
+                  ToolTip.Tip="{DynamicResource Text.AIChat.New}" AutomationProperties.Name="{DynamicResource Text.AIChat.New}" IsEnabled="{Binding !IsBusy}">
+            <Path Width="10" Height="10" Stretch="Uniform" Data="{StaticResource Icons.Plus}"/>
+          </Button>
+          <Button Classes="flat" Width="22" Height="22" Padding="0" Click="OnHide"
+                  ToolTip.Tip="{DynamicResource Text.AIChat.Hide}" AutomationProperties.Name="{DynamicResource Text.AIChat.Hide}">
+            <Path Width="10" Height="10" Stretch="Uniform" Data="{StaticResource Icons.Close}"/>
           </Button>
         </StackPanel>
       </Grid>
