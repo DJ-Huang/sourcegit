@@ -872,6 +872,8 @@
   <x:String x:Key="Text.PublishReview.DefaultTarget" xml:space="preserve">默认目标分支</x:String>
   <x:String x:Key="Text.PublishReview.Description" xml:space="preserve">描述（Markdown）</x:String>
   <x:String x:Key="Text.PublishReview.Disabled" xml:space="preserve">停用</x:String>
+  <x:String x:Key="Text.PublishReview.LoadFailed" xml:space="preserve">无法加载 PR/MR 信息：{0}</x:String>
+  <x:String x:Key="Text.PublishReview.PublishFailed" xml:space="preserve">无法发布 PR/MR：{0}</x:String>
   <x:String x:Key="Text.PublishReview.DraftFailed" xml:space="preserve">无法生成草稿。如果本地缺少目标提交，请先获取目标远端。{0}</x:String>
   <x:String x:Key="Text.PublishReview.DuplicateInstance" xml:space="preserve">此实例已配置为另一种托管平台。</x:String>
   <x:String x:Key="Text.PublishReview.Existing" xml:space="preserve">已找到对应的 PR/MR。</x:String>

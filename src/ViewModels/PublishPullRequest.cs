@@ -204,7 +204,7 @@ namespace SourceGit.ViewModels
             }
             catch (Exception e)
             {
-                Status = App.Text("DiffAnalysis.Error", e.Message);
+                Status = App.Text("PublishReview.LoadFailed", e.Message);
             }
             finally
             {
@@ -297,7 +297,7 @@ namespace SourceGit.ViewModels
             }
             catch (Exception e)
             {
-                Status = App.Text("DiffAnalysis.Error", e.Message);
+                Status = App.Text("PublishReview.PublishFailed", e.Message);
             }
             finally
             {

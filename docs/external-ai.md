@@ -18,7 +18,9 @@ SourceGit launches the command in the selected worktree. The command inherits yo
   | `session` | `id` | Optional session identifier for the completed answer |
   | `error` | `text`, optional `code` | A failed request |
 
-For a resumable JSONL profile, specify optional resume arguments with `{sessionId}`. SourceGit appends them only when it has an active ID. A resumed command can report `{"type":"error","code":"session_expired","text":"…"}` to request one fresh attempt. SourceGit stores an ID after successful completion, keyed by worktree, profile configuration and task. Analysis resumes by default when resume arguments are set. Generation resumes when its option is enabled. Stopping a request does not replace the saved ID.
+For a resumable JSONL profile, specify optional resume arguments with `{sessionId}`. SourceGit appends them when it has a saved ID and saves a returned ID after a successful answer. A command can report `{"type":"error","code":"session_expired","text":"…"}` to start one fresh session.
+
+Chat session IDs are scoped to the worktree, conversation, profile and effective command arguments. Reopening a conversation can resume its session. Starting a new conversation or selecting a different model or effort starts a separate session. Commit generation uses its own session and resumes only when the profile's generation resume option is enabled.
 
 ## Examples
 
@@ -50,17 +52,23 @@ Set the following resume arguments for that adapter:
 
 The same app settings work with another vendor or a local backend by configuring its program directly or using a JSONL adapter for that backend. Profiles migrated from the older single-argument-string implementation show their previous arguments in the editor. Review the new input mode and enter any arguments you still need individually before enabling the profile's tasks.
 
-## Use a profile
+## Generate a commit subject
 
-Open the AI helper from the commit toolbar to generate a subject for all staged changes. From a selection in the staged file list, the helper generates from those files. Apply the returned subject to the commit editor.
+Open the AI helper from the commit toolbar and select **CLI**. Generate a one-line subject from all staged changes, review it, then apply it to the commit editor. From the staged file list, select the files to include and use its AI menu to generate from that selection. When amending, SourceGit uses the original commit's parent as the baseline.
 
-Right-click a commit, selected files, or a text diff and choose **AI → Add to AI Chat**. The context appears in the right sidebar and can be previewed or removed before you send it. Choose **AI → Analysis** to start a conversation with the selected changes and a suggested question. An independent window hosts the same chat when the repository view is too narrow.
+## Ask about changes
 
-Open the sidebar with the **AI Chat** button on the right of the repository toolbar. Select a CLI, enter a question, and press **Enter** or click **Send**. Use **Shift+Enter** for a new line. A chat uses the frozen snapshots for follow-up questions. **History** reopens locally saved conversations and drafts for this worktree. SourceGit stores history in its application configuration directory. Tool and reasoning output can be expanded during the session. Drag across the analysis to select multiple paragraphs or code blocks, then use the clipboard shortcut or the Copy menu.
+- Use **AI Chat** at the right end of the repository toolbar. SourceGit opens a side panel, or shows the same chat in a separate window when the repository view is too narrow.
+- Right-click a commit, selected files or lines in a text diff. **AI → Add to AI Chat** attaches the selection to the active draft. **AI → Analysis** prepares the selection and a suggested question for a new conversation. Review or remove attachments before sending.
+- Press **Enter** to send or **Shift+Enter** for a new line. Sending clears the composer and shows the question and attachments in the conversation. Follow-up questions use the frozen attachments. **Stop** cancels the current request. On cancellation or CLI failure, SourceGit restores the draft and its attachments. The external command may impose its own time limit.
+- Answers support Markdown and code blocks. Select text across paragraphs or blocks to copy it. If the CLI emits reasoning or tool events, expand them in the conversation.
+- **History** reopens saved conversations and drafts for this worktree, including after restarting SourceGit. The application configuration directory stores chat messages, drafts and attached Git snapshots. Tool activity and reasoning are available in the current app session.
 
-Open **AI Chat model and effort** in an external CLI profile to configure the optional composer selectors. Enter the supported model IDs or effort values one per line. Add the matching argument template, such as `--model={model}` or `--reasoning_effort={effort}` for supported Codely models. Each argument line is passed separately. **CLI default** omits the corresponding override. SourceGit remembers the choices per chat and resumes CLI sessions for the same effective command arguments. These selectors apply to chat requests.
+### Choose a model and effort
 
-Sending moves the draft and its pending attachments into the conversation and clears the composer. SourceGit waits for the external AI command to finish. If the CLI reports an error or you click **Stop**, the draft and its attachments return to the composer.
+In an external CLI profile, expand **AI Chat model and effort**. Enter supported model IDs or effort values one per line, then add the argument templates for that CLI. For example, a CLI may expect `--model={model}` and `--reasoning_effort={effort}`. Use that CLI's documented flags and values. Add each argument on its own line.
+
+The corresponding selectors appear under the chat composer. **CLI default** leaves the override unset, and SourceGit remembers the selection per conversation. For commit generation, use the profile's main arguments or create a dedicated profile with the desired model and effort.
 
 ## Create a branch and commit
 

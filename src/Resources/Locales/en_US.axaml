@@ -868,6 +868,8 @@
   <x:String x:Key="Text.PublishReview.DefaultTarget" xml:space="preserve">Default target branch</x:String>
   <x:String x:Key="Text.PublishReview.Description" xml:space="preserve">Description (Markdown)</x:String>
   <x:String x:Key="Text.PublishReview.Disabled" xml:space="preserve">Disabled</x:String>
+  <x:String x:Key="Text.PublishReview.LoadFailed" xml:space="preserve">Could not load PR/MR details: {0}</x:String>
+  <x:String x:Key="Text.PublishReview.PublishFailed" xml:space="preserve">Could not publish PR/MR: {0}</x:String>
   <x:String x:Key="Text.PublishReview.DraftFailed" xml:space="preserve">Could not generate a draft. Fetch the target remote if its commits are missing locally. {0}</x:String>
   <x:String x:Key="Text.PublishReview.DuplicateInstance" xml:space="preserve">This server is configured for a different provider already.</x:String>
   <x:String x:Key="Text.PublishReview.Existing" xml:space="preserve">A matching request already exists.</x:String>

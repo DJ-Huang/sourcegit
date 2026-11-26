@@ -2,11 +2,20 @@
 
 ## Set up PR/MR credentials
 
-In **Preferences → PR/MR Credentials**, add a GitHub or GitLab connection. Enter the HTTPS address of the instance, such as `https://github.com`, `https://gitlab.com`, or your self-hosted server, and paste the token. For GitHub, use a token with access to the repositories and permission to write pull requests. For GitLab, use a token with the `api` scope and access to both projects. SourceGit stores tokens in the operating system's credential store and selects a connection by the target remote's host. An SSH remote can use the same PR/MR connection when its hostname matches the configured instance. Git reads and pushes use the repository's existing Git authentication.
+In **Preferences → PR/MR credentials**, add a GitHub or GitLab connection. Enter the HTTPS address of the instance, such as `https://github.com`, `https://gitlab.com`, or your self-hosted server, and paste the token. For GitHub, use a token with access to the repositories and permission to write pull requests. For GitLab, use a token with the `api` scope and access to both projects. SourceGit stores tokens in the operating system's credential store and selects a connection by the target remote's host. An SSH remote can use the same PR/MR connection when its hostname matches the configured instance. Git reads and pushes use the repository's existing Git authentication.
 
-In **Repository configuration → Publish Pull/Merge Request**, you can optionally set the source remote, target remote, default target branch and description template. The target branch falls back to the last successful selection for that remote or the remote's default branch. The publication dialog lets you change both remotes and the target branch. You can enable the draft task in an external AI profile to generate the title and description from local Git data, then edit both fields.
+## Choose a destination and publish
 
-Right-click a local branch and choose **AI → Create PR/MR…**. The dialog shows the source remote, target remote, target branch, and matched connection. Confirm the displayed refs, title and description with **Push if needed and publish**. SourceGit pushes the selected revision when it is missing or behind on the source remote. A rejected push stops publication. If the result of a create request is uncertain, the next attempt checks for a matching request before creating one.
+1. In **Repository configuration → Publish Pull/Merge Request**, optionally set the source remote, target remote, default target branch and description template. For each target remote, SourceGit prefers the configured branch, then the last successful selection, then the remote's default branch.
+2. Right-click a local branch and choose **AI → Create PR/MR…**. Check the source remote, target remote, target branch and matched connection. For a fork, select its remote as the source and the upstream repository's remote as the target. Both projects must be on the configured GitHub or GitLab instance.
+3. Enter a title and description, or enable **Generate PR/MR draft** in an external AI profile and generate an editable draft. Drafting uses local Git objects for both selected revisions. Fetch the target branch and refresh the dialog if the revision shown in the dialog is missing locally.
+4. Select **Push if needed and publish** after checking the refs and text. SourceGit verifies the reviewed tips and pushes the source branch if it needs updating. A rejected push stops publication. After a failed or interrupted create request, try again from the dialog. SourceGit checks for an existing open request for the same source and target before creating one.
+
+### Troubleshooting
+
+- If a connection is missing, use **Set access token** in the dialog. Match the target remote's host. GitHub and GitLab credentials control the provider API request.
+- If Git rejects the push or cannot read either remote, check the remote URL and the repository's Git authentication, then refresh the dialog.
+- If the provider denies publication, verify the token's access to both projects and its permission to create a pull or merge request.
 
 ## Legacy publisher protocol
 
