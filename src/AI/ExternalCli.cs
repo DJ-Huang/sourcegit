@@ -21,10 +21,14 @@ namespace SourceGit.AI
     {
         internal readonly record struct Reply(string Text, bool Restarted);
 
-        public ExternalCli(ExternalCliProfile profile)
+        public ExternalCli(ExternalCliProfile profile, string chatModel = null, string chatEffort = null)
         {
             _executable = profile.Executable?.Trim();
-            _arguments = ExternalCliProfile.ReadArguments(profile.Arguments);
+            _arguments = [
+                .. ExternalCliProfile.ReadArguments(profile.Arguments),
+                .. ExternalCliProfile.ExpandChatArguments(profile.ChatModels, profile.ChatModelArguments, ExternalCliProfile.ChatModelToken, chatModel),
+                .. ExternalCliProfile.ExpandChatArguments(profile.ChatEfforts, profile.ChatEffortArguments, ExternalCliProfile.ChatEffortToken, chatEffort),
+            ];
             _resumeArguments = ExternalCliProfile.ReadArguments(profile.ResumeArguments);
             _timeout = Math.Clamp(profile.TimeoutSeconds, 1, 1800);
             _usePromptFile = profile.UsePromptFile;

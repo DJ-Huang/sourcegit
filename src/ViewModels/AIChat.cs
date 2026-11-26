@@ -9,9 +9,16 @@ using Avalonia.Threading;
 
 namespace SourceGit.ViewModels
 {
+    public sealed record AIChatOption(string Value, string Label);
+
     public sealed class AIChat : AnalysisTranscript
     {
         public AI.ExternalCliProfile[] Profiles { get; private set; } = [];
+        public AIChatOption[] ModelOptions { get; private set; } = [];
+        public AIChatOption[] EffortOptions { get; private set; } = [];
+        public bool HasModelOptions => ModelOptions.Length > 1;
+        public bool HasEffortOptions => EffortOptions.Length > 1;
+        public bool HasChatOptions => HasModelOptions || HasEffortOptions;
         public bool HasProfiles => Profiles.Length > 0;
         public bool IsBusy => _request != null;
         public bool IsSending => IsBusy && _isSending;
@@ -35,8 +42,39 @@ namespace SourceGit.ViewModels
                 if (CanSelectProfile && value != null && SetProperty(ref _selectedProfile, value))
                 {
                     _current.ProfileId = value.Id;
+                    _current.Model = string.Empty;
+                    _current.Effort = string.Empty;
+                    RefreshChatOptions();
                     ScheduleSave();
                     OnPropertyChanged(nameof(CanSend));
+                }
+            }
+        }
+
+        public AIChatOption SelectedModel
+        {
+            get => FindOption(ModelOptions, _current.Model);
+            set
+            {
+                if (!IsBusy && value != null && ModelOptions.Contains(value) && _current.Model != value.Value)
+                {
+                    _current.Model = value.Value;
+                    ScheduleSave();
+                    OnPropertyChanged(nameof(SelectedModel));
+                }
+            }
+        }
+
+        public AIChatOption SelectedEffort
+        {
+            get => FindOption(EffortOptions, _current.Effort);
+            set
+            {
+                if (!IsBusy && value != null && EffortOptions.Contains(value) && _current.Effort != value.Value)
+                {
+                    _current.Effort = value.Value;
+                    ScheduleSave();
+                    OnPropertyChanged(nameof(SelectedEffort));
                 }
             }
         }
@@ -126,8 +164,30 @@ namespace SourceGit.ViewModels
             OnPropertyChanged(nameof(Profiles));
             OnPropertyChanged(nameof(HasProfiles));
             OnPropertyChanged(nameof(SelectedProfile));
+            RefreshChatOptions();
             UpdateActions();
         }
+
+        private void RefreshChatOptions()
+        {
+            var profile = SelectedProfile;
+            ModelOptions = CreateChoices(profile?.ChatModels, profile?.ChatModelArguments, AI.ExternalCliProfile.ChatModelToken);
+            EffortOptions = CreateChoices(profile?.ChatEfforts, profile?.ChatEffortArguments, AI.ExternalCliProfile.ChatEffortToken);
+            OnPropertyChanged(nameof(ModelOptions));
+            OnPropertyChanged(nameof(EffortOptions));
+            OnPropertyChanged(nameof(HasModelOptions));
+            OnPropertyChanged(nameof(HasEffortOptions));
+            OnPropertyChanged(nameof(HasChatOptions));
+            OnPropertyChanged(nameof(SelectedModel));
+            OnPropertyChanged(nameof(SelectedEffort));
+        }
+
+        private static AIChatOption[] CreateChoices(string values, string arguments, string token) =>
+            [new(string.Empty, App.Text("AIChat.ProviderDefault")),
+                .. AI.ExternalCliProfile.ReadChatChoices(values, arguments, token).Select(static value => new AIChatOption(value, value))];
+
+        private static AIChatOption FindOption(AIChatOption[] options, string value) =>
+            Array.Find(options, option => option.Value == value) ?? options.FirstOrDefault();
 
         public void NewChat()
         {
@@ -219,6 +279,8 @@ namespace SourceGit.ViewModels
                 return;
 
             var profile = SelectedProfile;
+            var model = SelectedModel?.Value;
+            var effort = SelectedEffort?.Value;
             var text = Draft.Trim();
             var defaultQuestion = App.Text("AIChat.DefaultQuestion");
             var question = text.Length > 0 ? text : defaultQuestion;
@@ -235,7 +297,7 @@ namespace SourceGit.ViewModels
                 if (attachments.Any(static item => item.Snapshot.HasNonText))
                     AddNotice(App.Text("DiffAnalysis.NonText"));
 
-                var agent = new AI.ExternalCli(profile);
+                var agent = new AI.ExternalCli(profile, model, effort);
                 var reply = await agent.RunAsync(_repo, AI.ExternalCliTask.DiffAnalysis, prompt, cancellation.Token, QueueTrace, _current.Id);
                 cancellation.Token.ThrowIfCancellationRequested();
                 if (reply.Restarted)

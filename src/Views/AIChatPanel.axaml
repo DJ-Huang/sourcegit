@@ -45,19 +45,25 @@
 
     <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="10,6" ColumnSpacing="8">
       <TextBlock Classes="bold" VerticalAlignment="Center" Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}"/>
-      <Panel Grid.Column="1">
-        <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile, Mode=TwoWay}"
-                  IsVisible="{Binding HasProfiles}" IsEnabled="{Binding CanSelectProfile}"
-                  MinWidth="95" MaxWidth="150" AutomationProperties.Name="CLI">
-          <ComboBox.ItemTemplate>
-            <DataTemplate x:DataType="ai:ExternalCliProfile">
-              <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"/>
-            </DataTemplate>
-          </ComboBox.ItemTemplate>
-        </ComboBox>
-        <Button Classes="flat" IsVisible="{Binding !HasProfiles}" IsEnabled="{Binding !IsBusy}"
-                Content="{DynamicResource Text.ExternalCLI.Configure}" Click="OnConfigure"/>
-      </Panel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+        <Panel>
+          <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile, Mode=TwoWay}"
+                    IsVisible="{Binding HasProfiles}" IsEnabled="{Binding CanSelectProfile}"
+                    MinWidth="95" MaxWidth="150" AutomationProperties.Name="CLI">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="ai:ExternalCliProfile">
+                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <Button Classes="flat" IsVisible="{Binding !HasProfiles}" IsEnabled="{Binding !IsBusy}"
+                  Content="{DynamicResource Text.ExternalCLI.Configure}" Click="OnConfigure"/>
+        </Panel>
+        <Button Classes="icon_button" Padding="3" Click="OnConfigure" IsVisible="{Binding HasProfiles}" IsEnabled="{Binding !IsBusy}"
+                ToolTip.Tip="{DynamicResource Text.ExternalCLI.Configure}" AutomationProperties.Name="{DynamicResource Text.ExternalCLI.Configure}">
+          <Path Width="13" Height="13" Stretch="Uniform" Data="{StaticResource Icons.Settings}"/>
+        </Button>
+      </StackPanel>
     </Grid>
 
     <Border Grid.Row="2" Background="{DynamicResource Brush.Contents}" BorderBrush="{DynamicResource Brush.Border0}" BorderThickness="0,1">
@@ -110,6 +116,27 @@
           </ScrollViewer>
         </Grid>
       </Border>
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="8" IsVisible="{Binding HasChatOptions}" IsEnabled="{Binding !IsBusy}">
+        <StackPanel Spacing="2" IsVisible="{Binding HasModelOptions}">
+          <TextBlock FontSize="11" Foreground="{DynamicResource Brush.FG2}" Text="{DynamicResource Text.AIChat.Model}"/>
+          <ComboBox x:Name="ModelPicker" HorizontalAlignment="Stretch" ItemsSource="{Binding ModelOptions}"
+                    AutomationProperties.Name="{DynamicResource Text.AIChat.Model}" SelectedItem="{Binding SelectedModel, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:AIChatOption"><TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Label}"/></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="2" IsVisible="{Binding HasEffortOptions}">
+          <TextBlock FontSize="11" Foreground="{DynamicResource Brush.FG2}" Text="{DynamicResource Text.AIChat.Effort}"/>
+          <ComboBox x:Name="EffortPicker" HorizontalAlignment="Stretch" ItemsSource="{Binding EffortOptions}"
+                    AutomationProperties.Name="{DynamicResource Text.AIChat.Effort}" SelectedItem="{Binding SelectedEffort, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:AIChatOption"><TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Label}"/></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+      </Grid>
 
       <TextBox x:Name="ChatBox" Text="{Binding Draft, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap"
                MinHeight="47" MaxHeight="110" VerticalContentAlignment="Top" IsReadOnly="{Binding IsSending}"

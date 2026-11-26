@@ -28,6 +28,8 @@ namespace SourceGit.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid ProfileId { get; set; }
+        public string Model { get; set; } = string.Empty;
+        public string Effort { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public DateTimeOffset LastOpened { get; set; }
         public string Draft { get; set; } = string.Empty;

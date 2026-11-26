@@ -145,7 +145,9 @@ namespace SourceGit.Views
             UpdateAIChatLayout();
         }
 
-        private void OnToggleAIChat(object sender, RoutedEventArgs e)
+        private void OnToggleAIChat(object sender, RoutedEventArgs e) => ToggleAIChat();
+
+        internal void ToggleAIChat()
         {
             if (AIChatDock.IsVisible)
                 HideAIChat();

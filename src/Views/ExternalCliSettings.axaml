@@ -66,6 +66,27 @@
                   <TextBlock Text="{DynamicResource Text.ExternalCLI.ResumeArguments}"/>
                   <TextBox Text="{Binding ResumeArguments, Mode=TwoWay}" MinHeight="53" AcceptsReturn="True"
                            FontFamily="{DynamicResource Fonts.Monospace}" VerticalContentAlignment="Top"/>
+                  <Expander Header="{DynamicResource Text.ExternalCLI.ChatOptions}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <StackPanel Spacing="6" Margin="0,4,0,2">
+                      <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatOptionsHelp}" TextWrapping="Wrap" Foreground="{DynamicResource Brush.FG2}"/>
+                      <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <StackPanel Spacing="5">
+                          <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatModels}"/>
+                          <TextBox Text="{Binding ChatModels, Mode=TwoWay}" MinHeight="60" AcceptsReturn="True" VerticalContentAlignment="Top"/>
+                          <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatModelArguments}"/>
+                          <TextBox Text="{Binding ChatModelArguments, Mode=TwoWay}" MinHeight="49" AcceptsReturn="True" VerticalContentAlignment="Top"
+                                   FontFamily="{DynamicResource Fonts.Monospace}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="5">
+                          <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatEfforts}"/>
+                          <TextBox Text="{Binding ChatEfforts, Mode=TwoWay}" MinHeight="60" AcceptsReturn="True" VerticalContentAlignment="Top"/>
+                          <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatEffortArguments}"/>
+                          <TextBox Text="{Binding ChatEffortArguments, Mode=TwoWay}" MinHeight="49" AcceptsReturn="True" VerticalContentAlignment="Top"
+                                   FontFamily="{DynamicResource Fonts.Monospace}"/>
+                        </StackPanel>
+                      </Grid>
+                    </StackPanel>
+                  </Expander>
                   <CheckBox Content="{DynamicResource Text.ExternalCLI.ResumeGeneration}" IsChecked="{Binding ResumeGeneration, Mode=TwoWay}"/>
                   <TextBlock Text="{DynamicResource Text.ExternalCLI.Timeout}"/>
                   <NumericUpDown Minimum="1" Maximum="1800" Value="{Binding TimeoutSeconds, Mode=TwoWay}"/>
