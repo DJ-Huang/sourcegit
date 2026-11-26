@@ -22,10 +22,14 @@ namespace SourceGit.AI
     {
         internal readonly record struct Reply(string Text, bool Restarted);
 
-        public ExternalCli(ExternalCliProfile profile)
+        public ExternalCli(ExternalCliProfile profile, string chatModel = null, string chatEffort = null)
         {
             _executable = profile.Executable?.Trim();
-            _arguments = ExternalCliProfile.ReadArguments(profile.Arguments);
+            _arguments = [
+                .. ExternalCliProfile.ReadArguments(profile.Arguments),
+                .. ExternalCliProfile.ExpandChatArguments(profile.ChatModels, profile.ChatModelArguments, ExternalCliProfile.ChatModelToken, chatModel),
+                .. ExternalCliProfile.ExpandChatArguments(profile.ChatEfforts, profile.ChatEffortArguments, ExternalCliProfile.ChatEffortToken, chatEffort),
+            ];
             _resumeArguments = ExternalCliProfile.ReadArguments(profile.ResumeArguments);
             _timeout = Math.Clamp(profile.TimeoutSeconds, 1, 1800);
             _usePromptFile = profile.UsePromptFile;
@@ -38,7 +42,7 @@ namespace SourceGit.AI
         }
 
         public async Task<Reply> RunAsync(string worktree, ExternalCliTask task, string prompt, CancellationToken cancellation,
-            Action<ExternalCliEvent> emit = null)
+            Action<ExternalCliEvent> emit = null, Guid conversationId = default)
         {
             var fileToken = _arguments.Any(static argument => argument.Contains(PromptFileToken, StringComparison.Ordinal));
             if (fileToken != _usePromptFile || _arguments.Any(static argument => argument.Contains(SessionToken, StringComparison.Ordinal)) ||
@@ -57,7 +61,10 @@ namespace SourceGit.AI
             if (OperatingSystem.IsWindows())
                 directory = directory.ToUpperInvariant();
 
-            var path = Path.Combine(Native.OS.BasicDirectories.ConfigDir, "external-cli-sessions", Hash($"{directory}\0{_key}\0{task}") + ".id");
+            var scope = $"{directory}\0{_key}\0{task}";
+            if (conversationId != Guid.Empty)
+                scope += $"\0{conversationId:N}";
+            var path = Path.Combine(Native.OS.BasicDirectories.ConfigDir, "external-cli-sessions", Hash(scope) + ".id");
             using var sessionLock = await LockAsync(path, cancellation).ConfigureAwait(false);
             var id = sessionLock == null ? null : LoadSession(path);
             var restarted = false;

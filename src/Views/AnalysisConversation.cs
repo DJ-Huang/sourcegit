@@ -16,17 +16,20 @@ using AvaloniaEdit.Editing;
 
 namespace SourceGit.Views
 {
-    public class AnalysisConversation : ScrollViewer
+    public partial class AnalysisConversation : ScrollViewer
     {
         public static readonly DirectProperty<AnalysisConversation, bool> HasSelectionProperty =
             AvaloniaProperty.RegisterDirect<AnalysisConversation, bool>(nameof(HasSelection), view => view.HasSelection);
 
         public bool HasSelection => _hasSelection;
 
+        internal event Action<Models.AIChatAttachment> AttachmentClicked;
+
         protected override Type StyleKeyOverride => typeof(ScrollViewer);
 
         public AnalysisConversation()
         {
+            InitializeComponent();
             Focusable = true;
             AddHandler(PointerPressedEvent, OnSelectionPressed, RoutingStrategies.Tunnel);
             AddHandler(KeyDownEvent, OnSelectionKeyDown, RoutingStrategies.Tunnel);
@@ -36,6 +39,12 @@ namespace SourceGit.Views
 
         internal string GetSelectedText() => string.Join(Environment.NewLine,
             _sections.Where(section => section.IsAvailable && section.HasSelection).Select(section => section.GetSelectedText()));
+
+        private void OnAttachmentClicked(object sender, RoutedEventArgs e)
+        {
+            if (sender is Control { DataContext: Models.AIChatAttachment attachment })
+                AttachmentClicked?.Invoke(attachment);
+        }
 
         protected override void OnPointerMoved(PointerEventArgs e)
         {

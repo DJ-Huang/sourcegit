@@ -54,7 +54,11 @@ The same app settings work with another vendor or a local backend by configuring
 
 Open the AI helper from the commit toolbar to generate a subject for all staged changes. From a selection in the staged file list, the helper generates from those files. Apply the returned subject to the commit editor.
 
-To analyze a commit, a file selection, or a text diff, open its context menu and choose **AI → Analysis**. Select a CLI profile at the top of the window and click **Start analysis**. The window captures the change when you open it and reuses that snapshot and the selected CLI for follow-up questions. Expand tool or provider reasoning output when available. Drag across the analysis to select multiple paragraphs and code blocks, then use the clipboard shortcut or the Copy menu.
+Right-click a commit, selected files, or a text diff and choose **AI → Add to AI Chat**. The context appears in the right sidebar and can be previewed or removed before you send it. Choose **AI → Analysis** to start a conversation with the selected changes and a suggested question. An independent window hosts the same chat when the repository view is too narrow.
+
+Open the sidebar with the **AI Chat** button on the right of the repository toolbar. Select a CLI, enter a question, and press **Enter** or click **Send**. Use **Shift+Enter** for a new line. A chat uses the frozen snapshots for follow-up questions. **History** reopens locally saved conversations and drafts for this worktree. SourceGit stores history in its application configuration directory. Tool and reasoning output can be expanded during the session. Drag across the analysis to select multiple paragraphs or code blocks, then use the clipboard shortcut or the Copy menu.
+
+Open **AI Chat model and effort** in an external CLI profile to configure the optional composer selectors. Enter the supported model IDs or effort values one per line. Add the matching argument template, such as `--model={model}` or `--reasoning_effort={effort}` for supported Codely models. Each argument line is passed separately. **CLI default** omits the corresponding override. SourceGit remembers the choices per chat and resumes CLI sessions for the same effective command arguments. These selectors apply to chat requests.
 
 ## Create a branch and commit
 

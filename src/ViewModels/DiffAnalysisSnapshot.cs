@@ -113,12 +113,10 @@ namespace SourceGit.ViewModels
                     continue;
                 }
 
-                var range = option.ToString();
-                var diff = await new Commands.GetAIDiff(repo, range, range.StartsWith("--no-index ", StringComparison.Ordinal))
-                    .ReadAsync(budget, cancellation).ConfigureAwait(false);
+                var diff = await ReadFileAsync(repo, option, budget, cancellation).ConfigureAwait(false);
                 truncated |= diff.Truncated;
-                nonText |= HasNonTextChanges(diff.Text);
-                if (diff.Text.Length == 0)
+                nonText |= diff.HasNonText;
+                if (!diff.HasChangesInScope)
                 {
                     const string note = "[No text diff available]\n";
                     patch.Append(note.AsSpan(0, Math.Min(budget, note.Length)));
@@ -127,14 +125,23 @@ namespace SourceGit.ViewModels
                 else
                 {
                     hasChanges = true;
-                    patch.Append(diff.Text);
-                    if (diff.Text[^1] != '\n' && patch.Length < MaxDiffChars)
+                    patch.Append(diff.Patch);
+                    if (diff.Patch[^1] != '\n' && patch.Length < MaxDiffChars)
                         patch.Append('\n');
                 }
             }
 
             var subject = $"{options.Length} selected files";
             return new(string.Empty, subject, string.Empty, "See the source next to each file below", patch.ToString(), truncated, nonText, hasChanges);
+        }
+
+        internal static async Task<DiffAnalysisSnapshot> ReadFileAsync(string repo, Models.DiffOption option, int limit, CancellationToken cancellation)
+        {
+            var range = option.ToString();
+            var diff = await new Commands.GetAIDiff(repo, range, range.StartsWith("--no-index ", StringComparison.Ordinal))
+                .ReadAsync(limit, cancellation).ConfigureAwait(false);
+            return new(string.Empty, option.Path, option.OrgPath, DescribeSource(option), diff.Text, diff.Truncated,
+                HasNonTextChanges(diff.Text), diff.Text.Length > 0);
         }
 
         private static bool HasNonTextChanges(string diff) =>

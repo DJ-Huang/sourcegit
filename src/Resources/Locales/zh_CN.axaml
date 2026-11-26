@@ -390,6 +390,37 @@
   <x:String x:Key="Text.DeleteTag" xml:space="preserve">删除标签确认</x:String>
   <x:String x:Key="Text.DeleteTag.Tag" xml:space="preserve">标签名 ：</x:String>
   <x:String x:Key="Text.DeleteTag.WithRemote" xml:space="preserve">同时删除远程仓库中的此标签</x:String>
+  <x:String x:Key="Text.AIChat" xml:space="preserve">AI 对话</x:String>
+  <x:String x:Key="Text.AIChat.Added" xml:space="preserve">已添加 {0} 项上下文。</x:String>
+  <x:String x:Key="Text.AIChat.AlreadyAdded" xml:space="preserve">已在待发送上下文中。</x:String>
+  <x:String x:Key="Text.AIChat.Attach" xml:space="preserve">添加到 AI 对话</x:String>
+  <x:String x:Key="Text.AIChat.AttachmentLimit" xml:space="preserve">待发送上下文已达到长度上限。</x:String>
+  <x:String x:Key="Text.AIChat.Busy" xml:space="preserve">请等待当前请求完成，或先停止它。</x:String>
+  <x:String x:Key="Text.AIChat.CaptureFailed" xml:space="preserve">无法读取选中的变更。{0}</x:String>
+  <x:String x:Key="Text.AIChat.Capturing" xml:space="preserve">正在记录选中的变更…</x:String>
+  <x:String x:Key="Text.AIChat.ClosePreview" xml:space="preserve">关闭快照预览</x:String>
+  <x:String x:Key="Text.AIChat.DefaultQuestion" xml:space="preserve">请分析这些变更的影响。</x:String>
+  <x:String x:Key="Text.AIChat.Draft" xml:space="preserve">问这段变更，或输入接下来要看的问题…</x:String>
+  <x:String x:Key="Text.AIChat.DraftKept" xml:space="preserve">已保留草稿和上下文。</x:String>
+  <x:String x:Key="Text.AIChat.Effort" xml:space="preserve">推理等级</x:String>
+  <x:String x:Key="Text.AIChat.Empty" xml:space="preserve">右键变更或提交，选择「AI → 添加到 AI 对话」。</x:String>
+  <x:String x:Key="Text.AIChat.Hide" xml:space="preserve">收起 AI 对话</x:String>
+  <x:String x:Key="Text.AIChat.History" xml:space="preserve">历史</x:String>
+  <x:String x:Key="Text.AIChat.LoadFailed" xml:space="preserve">部分本地对话无法加载。</x:String>
+  <x:String x:Key="Text.AIChat.Model" xml:space="preserve">模型</x:String>
+  <x:String x:Key="Text.AIChat.New" xml:space="preserve">新对话</x:String>
+  <x:String x:Key="Text.AIChat.Pending" xml:space="preserve">待发送上下文 · {0} 项</x:String>
+  <x:String x:Key="Text.AIChat.ProviderDefault" xml:space="preserve">CLI 默认</x:String>
+  <x:String x:Key="Text.AIChat.Remove" xml:space="preserve">移除上下文</x:String>
+  <x:String x:Key="Text.AIChat.Running" xml:space="preserve">正在分析变更…</x:String>
+  <x:String x:Key="Text.AIChat.SaveFailed" xml:space="preserve">无法将本次对话保存到本机。</x:String>
+  <x:String x:Key="Text.AIChat.Search" xml:space="preserve">搜索此工作树的对话</x:String>
+  <x:String x:Key="Text.AIChat.Send" xml:space="preserve">发送</x:String>
+  <x:String x:Key="Text.AIChat.SendShortcut" xml:space="preserve">Enter 发送 · Shift+Enter 换行</x:String>
+  <x:String x:Key="Text.AIChat.Source.Commit" xml:space="preserve">提交</x:String>
+  <x:String x:Key="Text.AIChat.Source.Revision" xml:space="preserve">版本对比</x:String>
+  <x:String x:Key="Text.AIChat.Source.Staged" xml:space="preserve">已暂存</x:String>
+  <x:String x:Key="Text.AIChat.Source.Unstaged" xml:space="preserve">未暂存</x:String>
   <x:String x:Key="Text.DiffAnalysis" xml:space="preserve">分析</x:String>
   <x:String x:Key="Text.DiffAnalysis.Ask" xml:space="preserve">追问</x:String>
   <x:String x:Key="Text.DiffAnalysis.CopySelection" xml:space="preserve">复制所选内容</x:String>
@@ -475,6 +506,12 @@
   <x:String x:Key="Text.ExecuteCustomAction.Repository" xml:space="preserve">本仓库</x:String>
   <x:String x:Key="Text.ExternalCLI.Add" xml:space="preserve">添加配置</x:String>
   <x:String x:Key="Text.ExternalCLI.Arguments" xml:space="preserve">参数（每行一个）</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatOptions" xml:space="preserve">AI 对话模型和推理等级</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatOptionsHelp" xml:space="preserve">每行填写一个可选值或参数。在对应参数里用 {model} 和 {effort} 标记要传入的值。</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatModels" xml:space="preserve">可选模型</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatModelArguments" xml:space="preserve">模型参数</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatEfforts" xml:space="preserve">可选推理等级</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatEffortArguments" xml:space="preserve">推理等级参数</x:String>
   <x:String x:Key="Text.ExternalCLI.Commit" xml:space="preserve">生成提交信息</x:String>
   <x:String x:Key="Text.ExternalCLI.Configure" xml:space="preserve">外部 CLI 配置</x:String>
   <x:String x:Key="Text.ExternalCLI.DiffError" xml:space="preserve">无法读取变更。{0}</x:String>
