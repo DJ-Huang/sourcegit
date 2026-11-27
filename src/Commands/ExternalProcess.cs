@@ -34,13 +34,13 @@ namespace SourceGit.Commands
             };
         }
 
-        public static async Task<Result> RunAsync(ProcessStartInfo start, string input, int maxOutputChars, int timeoutSeconds,
+        public static async Task<Result> RunAsync(ProcessStartInfo start, string input, int maxOutputChars, int? timeoutSeconds,
             CancellationToken cancellation, Action<string> onLine = null)
         {
             using var process = new Process() { StartInfo = start };
-            using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
-            deadline.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
-            var token = deadline.Token;
+            using var deadline = timeoutSeconds.HasValue ? CancellationTokenSource.CreateLinkedTokenSource(cancellation) : null;
+            deadline?.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds.GetValueOrDefault()));
+            var token = deadline?.Token ?? cancellation;
             token.ThrowIfCancellationRequested();
             try
             {
@@ -60,7 +60,7 @@ namespace SourceGit.Commands
                 await io.WaitAsync(token).ConfigureAwait(false);
                 return new Result(process.ExitCode, stdout.Result, stderr.Result.Text.Trim());
             }
-            catch (OperationCanceledException) when (!cancellation.IsCancellationRequested)
+            catch (OperationCanceledException) when (deadline?.IsCancellationRequested == true && !cancellation.IsCancellationRequested)
             {
                 throw new TimeoutException(App.Text("ExternalCLI.TimeoutError", timeoutSeconds));
             }

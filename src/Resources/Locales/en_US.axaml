@@ -386,6 +386,44 @@
   <x:String x:Key="Text.DeleteTag" xml:space="preserve">Delete Tag</x:String>
   <x:String x:Key="Text.DeleteTag.Tag" xml:space="preserve">Tag:</x:String>
   <x:String x:Key="Text.DeleteTag.WithRemote" xml:space="preserve">Delete from remote repositories</x:String>
+  <x:String x:Key="Text.AIChat" xml:space="preserve">AI Chat</x:String>
+  <x:String x:Key="Text.AIChat.Added" xml:space="preserve">Added {0} context item(s).</x:String>
+  <x:String x:Key="Text.AIChat.AlreadyAdded" xml:space="preserve">Already attached to this draft.</x:String>
+  <x:String x:Key="Text.AIChat.Attach" xml:space="preserve">Add to AI Chat</x:String>
+  <x:String x:Key="Text.AIChat.AttachmentLimit" xml:space="preserve">The draft reached its context limit.</x:String>
+  <x:String x:Key="Text.AIChat.Busy" xml:space="preserve">Wait for the current request or stop it first.</x:String>
+  <x:String x:Key="Text.AIChat.CaptureFailed" xml:space="preserve">Could not read the selected changes. {0}</x:String>
+  <x:String x:Key="Text.AIChat.Capturing" xml:space="preserve">Capturing the selected changes…</x:String>
+  <x:String x:Key="Text.AIChat.ClosePreview" xml:space="preserve">Close snapshot preview</x:String>
+  <x:String x:Key="Text.AIChat.DefaultQuestion" xml:space="preserve">Analyze the impact of these changes.</x:String>
+  <x:String x:Key="Text.AIChat.Draft" xml:space="preserve">Ask about the selected changes…</x:String>
+  <x:String x:Key="Text.AIChat.DraftWithSkills" xml:space="preserve">Ask about the selected changes or type / for skills…</x:String>
+  <x:String x:Key="Text.AIChat.Skill" xml:space="preserve">Skill</x:String>
+  <x:String x:Key="Text.AIChat.Skills" xml:space="preserve">CLI skills</x:String>
+  <x:String x:Key="Text.AIChat.RemoveSkill" xml:space="preserve">Remove skill</x:String>
+  <x:String x:Key="Text.AIChat.SkillsLoading" xml:space="preserve">Loading skills…</x:String>
+  <x:String x:Key="Text.AIChat.SkillsEmpty" xml:space="preserve">No matching skills.</x:String>
+  <x:String x:Key="Text.AIChat.SkillsError" xml:space="preserve">Could not load skills. {0}</x:String>
+  <x:String x:Key="Text.AIChat.DraftKept" xml:space="preserve">Draft and context kept.</x:String>
+  <x:String x:Key="Text.AIChat.Effort" xml:space="preserve">Reasoning effort</x:String>
+  <x:String x:Key="Text.AIChat.Empty" xml:space="preserve">Right-click a change or a commit and choose AI → Add to AI Chat.</x:String>
+  <x:String x:Key="Text.AIChat.Hide" xml:space="preserve">Close AI Chat panel</x:String>
+  <x:String x:Key="Text.AIChat.History" xml:space="preserve">History</x:String>
+  <x:String x:Key="Text.AIChat.LoadFailed" xml:space="preserve">Some local conversations could not be loaded.</x:String>
+  <x:String x:Key="Text.AIChat.Model" xml:space="preserve">Model</x:String>
+  <x:String x:Key="Text.AIChat.New" xml:space="preserve">New chat</x:String>
+  <x:String x:Key="Text.AIChat.Pending" xml:space="preserve">Pending context · {0}</x:String>
+  <x:String x:Key="Text.AIChat.ProviderDefault" xml:space="preserve">CLI default</x:String>
+  <x:String x:Key="Text.AIChat.Remove" xml:space="preserve">Remove attachment</x:String>
+  <x:String x:Key="Text.AIChat.Running" xml:space="preserve">Analyzing changes…</x:String>
+  <x:String x:Key="Text.AIChat.SaveFailed" xml:space="preserve">Could not save this conversation locally.</x:String>
+  <x:String x:Key="Text.AIChat.Search" xml:space="preserve">Search this worktree’s conversations</x:String>
+  <x:String x:Key="Text.AIChat.Send" xml:space="preserve">Send</x:String>
+  <x:String x:Key="Text.AIChat.SendShortcut" xml:space="preserve">Enter to send · Shift+Enter for a new line</x:String>
+  <x:String x:Key="Text.AIChat.Source.Commit" xml:space="preserve">Commit</x:String>
+  <x:String x:Key="Text.AIChat.Source.Revision" xml:space="preserve">Revision diff</x:String>
+  <x:String x:Key="Text.AIChat.Source.Staged" xml:space="preserve">Staged</x:String>
+  <x:String x:Key="Text.AIChat.Source.Unstaged" xml:space="preserve">Unstaged</x:String>
   <x:String x:Key="Text.DiffAnalysis" xml:space="preserve">Analysis</x:String>
   <x:String x:Key="Text.DiffAnalysis.Ask" xml:space="preserve">Ask</x:String>
   <x:String x:Key="Text.DiffAnalysis.CopySelection" xml:space="preserve">Copy selection</x:String>
@@ -471,6 +509,16 @@
   <x:String x:Key="Text.ExecuteCustomAction.Repository" xml:space="preserve">This repository</x:String>
   <x:String x:Key="Text.ExternalCLI.Add" xml:space="preserve">Add profile</x:String>
   <x:String x:Key="Text.ExternalCLI.Arguments" xml:space="preserve">Arguments (one per line)</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatOptions" xml:space="preserve">AI Chat model and effort</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatOptionsHelp" xml:space="preserve">Enter supported values and arguments one per line. Use {model} and {effort} in their corresponding arguments.</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatModels" xml:space="preserve">Model choices</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatModelArguments" xml:space="preserve">Model arguments</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatEfforts" xml:space="preserve">Effort choices</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatEffortArguments" xml:space="preserve">Effort arguments</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatSkills" xml:space="preserve">AI Chat skills</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatSkillsHelp" xml:space="preserve">Configure a command that lists skills as a JSON array, and the arguments to add after a skill is selected. Enter one argument per line and use {skill} for its ID.</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatSkillListArguments" xml:space="preserve">Skill list arguments</x:String>
+  <x:String x:Key="Text.ExternalCLI.ChatSkillArguments" xml:space="preserve">Use skill arguments</x:String>
   <x:String x:Key="Text.ExternalCLI.Commit" xml:space="preserve">Commit message generation</x:String>
   <x:String x:Key="Text.ExternalCLI.Configure" xml:space="preserve">External CLI profiles</x:String>
   <x:String x:Key="Text.ExternalCLI.DiffError" xml:space="preserve">Could not read the diff. {0}</x:String>
@@ -495,10 +543,8 @@
   <x:String x:Key="Text.ExternalCLI.Remove" xml:space="preserve">Remove profile</x:String>
   <x:String x:Key="Text.ExternalCLI.ResumeArguments" xml:space="preserve">Resume arguments (optional, one per line, include {sessionId})</x:String>
   <x:String x:Key="Text.ExternalCLI.ResumeGeneration" xml:space="preserve">Resume generation conversations</x:String>
-  <x:String x:Key="Text.ExternalCLI.SessionBusy" xml:space="preserve">This CLI session is still in use.</x:String>
   <x:String x:Key="Text.ExternalCLI.StartError" xml:space="preserve">Could not start the command. {0}</x:String>
   <x:String x:Key="Text.ExternalCLI.StructuredOutput" xml:space="preserve">Read SourceGit JSONL output</x:String>
-  <x:String x:Key="Text.ExternalCLI.Timeout" xml:space="preserve">Timeout (seconds)</x:String>
   <x:String x:Key="Text.ExternalCLI.TimeoutError" xml:space="preserve">The command timed out after {0} seconds.</x:String>
   <x:String x:Key="Text.Fetch" xml:space="preserve">Fetch</x:String>
   <x:String x:Key="Text.Fetch.AllRemotes" xml:space="preserve">Fetch all remotes</x:String>

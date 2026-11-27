@@ -22,12 +22,19 @@ namespace SourceGit.AI
     {
         internal readonly record struct Reply(string Text, bool Restarted);
 
-        public ExternalCli(ExternalCliProfile profile)
+        public ExternalCli(ExternalCliProfile profile, string chatModel = null, string chatEffort = null, ExternalCliSkill skill = null)
         {
             _executable = profile.Executable?.Trim();
-            _arguments = ExternalCliProfile.ReadArguments(profile.Arguments);
+            _arguments = [
+                .. ExternalCliProfile.ReadArguments(profile.Arguments),
+                .. ExternalCliProfile.ExpandChatArguments(profile.ChatModels, profile.ChatModelArguments, ExternalCliProfile.ChatModelToken, chatModel),
+                .. ExternalCliProfile.ExpandChatArguments(profile.ChatEfforts, profile.ChatEffortArguments, ExternalCliProfile.ChatEffortToken, chatEffort),
+                .. (profile.HasChatSkills && skill is { HasValidId: true }
+                    ? ExternalCliProfile.ReadArguments(profile.ChatSkillArguments).Select(argument =>
+                        argument.Replace(ExternalCliProfile.ChatSkillToken, skill.Id, StringComparison.Ordinal)).ToArray()
+                    : Array.Empty<string>()),
+            ];
             _resumeArguments = ExternalCliProfile.ReadArguments(profile.ResumeArguments);
-            _timeout = Math.Clamp(profile.TimeoutSeconds, 1, 1800);
             _usePromptFile = profile.UsePromptFile;
             _structured = profile.StructuredOutput;
             _resumeGeneration = profile.ResumeGeneration;
@@ -37,8 +44,26 @@ namespace SourceGit.AI
                 Hash(string.Join('\0', _arguments)), Hash(string.Join('\0', _resumeArguments))));
         }
 
+        internal static async Task<ExternalCliSkill[]> ListSkillsAsync(ExternalCliProfile profile, string worktree, CancellationToken cancellation)
+        {
+            var start = Commands.ExternalProcess.CreateStartInfo(profile.Executable?.Trim(), worktree);
+            foreach (var argument in ExternalCliProfile.ReadArguments(profile.ChatSkillListArguments))
+                start.ArgumentList.Add(argument);
+
+            var result = await Commands.ExternalProcess.RunAsync(start, null, 256 * 1024, timeoutSeconds: null, cancellation)
+                .ConfigureAwait(false);
+            if (result.StdOut.Truncated)
+                throw new InvalidOperationException(App.Text("ExternalCLI.OutputLimit"));
+            if (result.ExitCode != 0)
+                throw new InvalidOperationException(Commands.ExternalProcess.FormatError(result));
+
+            var skills = JsonSerializer.Deserialize(result.StdOut.Text, JsonCodeGen.Default.ExternalCliSkillArray) ?? [];
+            return skills.Where(static skill => skill is { HasValidId: true })
+                .DistinctBy(static skill => skill.Id, StringComparer.Ordinal).ToArray();
+        }
+
         public async Task<Reply> RunAsync(string worktree, ExternalCliTask task, string prompt, CancellationToken cancellation,
-            Action<ExternalCliEvent> emit = null)
+            Action<ExternalCliEvent> emit = null, Guid conversationId = default)
         {
             var fileToken = _arguments.Any(static argument => argument.Contains(PromptFileToken, StringComparison.Ordinal));
             if (fileToken != _usePromptFile || _arguments.Any(static argument => argument.Contains(SessionToken, StringComparison.Ordinal)) ||
@@ -57,7 +82,10 @@ namespace SourceGit.AI
             if (OperatingSystem.IsWindows())
                 directory = directory.ToUpperInvariant();
 
-            var path = Path.Combine(Native.OS.BasicDirectories.ConfigDir, "external-cli-sessions", Hash($"{directory}\0{_key}\0{task}") + ".id");
+            var scope = $"{directory}\0{_key}\0{task}";
+            if (conversationId != Guid.Empty)
+                scope += $"\0{conversationId:N}";
+            var path = Path.Combine(Native.OS.BasicDirectories.ConfigDir, "external-cli-sessions", Hash(scope) + ".id");
             using var sessionLock = await LockAsync(path, cancellation).ConfigureAwait(false);
             var id = sessionLock == null ? null : LoadSession(path);
             var restarted = false;
@@ -105,7 +133,7 @@ namespace SourceGit.AI
                 }
 
                 var events = _structured ? new Events(emit) : null;
-                var result = await Commands.ExternalProcess.RunAsync(start, _usePromptFile ? null : prompt, MaxOutputChars, _timeout,
+                var result = await Commands.ExternalProcess.RunAsync(start, _usePromptFile ? null : prompt, MaxOutputChars, timeoutSeconds: null,
                     cancellation, events == null ? null : events.Consume).ConfigureAwait(false);
                 if (result.StdOut.Truncated)
                     throw new InvalidOperationException(App.Text("ExternalCLI.OutputLimit"));
@@ -198,7 +226,6 @@ namespace SourceGit.AI
 
         private static async Task<FileStream> LockAsync(string path, CancellationToken cancellation)
         {
-            var deadline = Environment.TickCount64 + 300_000;
             while (true)
             {
                 cancellation.ThrowIfCancellationRequested();
@@ -209,8 +236,6 @@ namespace SourceGit.AI
                 }
                 catch (IOException e) when ((e.HResult & 0xffff) is 11 or 32 or 33)
                 {
-                    if (Environment.TickCount64 >= deadline)
-                        throw new TimeoutException(App.Text("ExternalCLI.SessionBusy"));
                     await Task.Delay(100, cancellation).ConfigureAwait(false);
                 }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException)
@@ -271,7 +296,6 @@ namespace SourceGit.AI
         private readonly string _executable;
         private readonly string[] _arguments;
         private readonly string[] _resumeArguments;
-        private readonly int _timeout;
         private readonly bool _usePromptFile;
         private readonly bool _structured;
         private readonly bool _resumeGeneration;

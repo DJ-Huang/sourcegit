@@ -54,4 +54,26 @@ The same app settings work with another vendor or a local backend by configuring
 
 Open the AI helper from the commit toolbar to generate a subject for all staged changes. From a selection in the staged file list, the helper generates from those files. Apply the returned subject to the commit editor.
 
-To analyze a commit, a file selection, or a text diff, open its context menu and choose **AI → Analysis**. Select a CLI profile at the top of the window and click **Start analysis**. The window captures the change when you open it and reuses that snapshot and the selected CLI for follow-up questions. Expand tool or provider reasoning output when available. Drag across the analysis to select multiple paragraphs and code blocks, then use the clipboard shortcut or the Copy menu.
+Right-click a commit, selected files, or a text diff and choose **AI → Add to AI Chat**. The context appears in the right sidebar and can be previewed or removed before you send it. Choose **AI → Analysis** to start a conversation with the selected changes and a suggested question. An independent window hosts the same chat when the repository view is too narrow.
+
+Open the sidebar with the **AI Chat** button on the right of the repository toolbar. Select a CLI, enter a question, and press **Enter** or click **Send**. Use **Shift+Enter** for a new line. A chat uses the frozen snapshots for follow-up questions. **History** reopens locally saved conversations and drafts for this worktree. SourceGit stores history in its application configuration directory. Tool and reasoning output can be expanded during the session. Drag across the analysis to select multiple paragraphs or code blocks, then use the clipboard shortcut or the Copy menu.
+
+Open **AI Chat model and effort** in an external CLI profile to configure the optional composer selectors. Enter the supported model IDs or effort values one per line. Add the matching argument template, such as `--model={model}` or `--reasoning_effort={effort}` for supported Codely models. Each argument line is passed separately. **CLI default** omits the corresponding override. SourceGit remembers the choices per chat and resumes CLI sessions for the same effective command arguments. These selectors apply to chat requests.
+
+### Select a CLI skill
+
+Expand **AI Chat skills** in an external CLI profile. **Skill list arguments** run the profile executable in the current worktree using these arguments in place of the main chat arguments. The list command must return a UTF-8 JSON array such as `[{"id":"code-review","name":"Code review","description":"Review a Git diff","source":"workspace"}]`. The `id` is required. The adapter should return enabled skills only.
+
+In **Use skill arguments**, enter one argument per line and use `{skill}` where the selected ID should go. For the Codely adapter, use these list arguments:
+
+```text
+<absolute path to codely-jsonl.mjs>
+<absolute path to the Codely CLI JavaScript entry point>
+--list-skills
+```
+
+Enter `--skills` and `{skill}` on separate lines under **Use skill arguments**. Codely picks up the skill in the worktree. Its normal collaboration and approval options still apply.
+
+Type `/` at the start of an empty composer and type to filter. Choose a skill, then enter your question. The composer shows the selected skill and clears it when you send. A failed or stopped request restores the skill along with the draft. History shows the skill on the question that used it.
+
+Sending moves the draft and its pending attachments into the conversation and clears the composer. SourceGit waits for the external AI command to finish. If the CLI reports an error or you click **Stop**, the draft and its attachments return to the composer.
