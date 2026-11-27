@@ -88,6 +88,17 @@
                       </Grid>
                     </StackPanel>
                   </Expander>
+                  <Expander Header="{DynamicResource Text.ExternalCLI.ChatSkills}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <StackPanel Spacing="6" Margin="0,4,0,2">
+                      <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatSkillsHelp}" TextWrapping="Wrap" Foreground="{DynamicResource Brush.FG2}"/>
+                      <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatSkillListArguments}"/>
+                      <TextBox Text="{Binding ChatSkillListArguments, Mode=TwoWay}" MinHeight="60" AcceptsReturn="True"
+                               FontFamily="{DynamicResource Fonts.Monospace}" VerticalContentAlignment="Top"/>
+                      <TextBlock Text="{DynamicResource Text.ExternalCLI.ChatSkillArguments}"/>
+                      <TextBox Text="{Binding ChatSkillArguments, Mode=TwoWay}" MinHeight="49" AcceptsReturn="True"
+                               FontFamily="{DynamicResource Fonts.Monospace}" VerticalContentAlignment="Top"/>
+                    </StackPanel>
+                  </Expander>
                   <CheckBox Content="{DynamicResource Text.ExternalCLI.ResumeGeneration}" IsChecked="{Binding ResumeGeneration, Mode=TwoWay}"/>
                   <TextBlock Text="{DynamicResource Text.Preferences.AI.AdditionalPrompt}"/>
                   <TextBox Text="{Binding AdditionalPrompt, Mode=TwoWay}" MinHeight="62" AcceptsReturn="True"

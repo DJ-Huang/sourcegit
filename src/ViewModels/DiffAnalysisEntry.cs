@@ -19,6 +19,8 @@ namespace SourceGit.ViewModels
         public bool HasMarkdown => !string.IsNullOrEmpty(_markdown);
         public Models.AIChatAttachment[] Attachments { get; }
         public bool HasAttachments => Attachments.Length > 0;
+        public string Skill { get; }
+        public bool HasSkill => !string.IsNullOrEmpty(Skill);
 
         public string Markdown
         {
@@ -42,13 +44,14 @@ namespace SourceGit.ViewModels
 
         public DiffAnalysisEntry ExpandedEntry => _isExpanded ? this : null;
 
-        internal DiffAnalysisEntry(AI.ExternalCliEvent entry, Models.AIChatAttachment[] attachments = null)
+        internal DiffAnalysisEntry(AI.ExternalCliEvent entry, Models.AIChatAttachment[] attachments = null, string skill = null)
         {
             _type = entry.Type;
             Heading = GetHeading(entry);
             _markdown = IsAnswer ? entry.Payload : entry.Thinking;
             Details = IsTrace ? entry.Payload : null;
             Attachments = attachments ?? [];
+            Skill = skill;
         }
 
         internal void AppendThinking(string text) => Markdown += text;

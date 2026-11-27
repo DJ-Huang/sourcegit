@@ -23,6 +23,8 @@ namespace SourceGit.AI
         public string ChatModelArguments { get; set; } = string.Empty;
         public string ChatEfforts { get; set; } = string.Empty;
         public string ChatEffortArguments { get; set; } = string.Empty;
+        public string ChatSkillListArguments { get; set; } = string.Empty;
+        public string ChatSkillArguments { get; set; } = string.Empty;
         public string AdditionalPrompt { get; set; } = string.Empty;
         public bool CanGenerateCommit { get; set; } = true;
         public bool CanAnalyze { get; set; } = true;
@@ -37,11 +39,16 @@ namespace SourceGit.AI
         [JsonIgnore]
         internal bool IsConfigured => Id != Guid.Empty && !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Executable);
 
+        [JsonIgnore]
+        internal bool HasChatSkills => !string.IsNullOrWhiteSpace(ChatSkillListArguments) &&
+            ChatSkillArguments?.Contains(ChatSkillToken, StringComparison.Ordinal) == true;
+
         internal static string[] ReadArguments(string value) => (value ?? string.Empty).ReplaceLineEndings("\n")
             .Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         internal const string ChatModelToken = "{model}";
         internal const string ChatEffortToken = "{effort}";
+        internal const string ChatSkillToken = "{skill}";
 
         internal static string[] ReadChatChoices(string choices, string arguments, string token) =>
             arguments?.Contains(token, StringComparison.Ordinal) == true

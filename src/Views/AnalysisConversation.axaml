@@ -38,6 +38,13 @@
                     BorderThickness="1" CornerRadius="8">
           <StackPanel Spacing="3">
             <SelectableTextBlock Text="{Binding Heading}" Foreground="{DynamicResource Brush.FG1}" TextWrapping="Wrap"/>
+            <Border IsVisible="{Binding HasSkill}" HorizontalAlignment="Left" CornerRadius="4" Padding="4,1"
+                    Background="{DynamicResource Brush.Contents}" BorderBrush="{DynamicResource Brush.Border2}" BorderThickness="1">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <TextBlock Text="{DynamicResource Text.AIChat.Skill}" FontSize="11" Foreground="{DynamicResource Brush.FG2}"/>
+                <TextBlock Text="{Binding Skill}" ToolTip.Tip="{Binding Skill}" FontSize="11" MaxWidth="150" TextTrimming="CharacterEllipsis"/>
+              </StackPanel>
+            </Border>
             <ItemsControl ItemsSource="{Binding Attachments}" IsVisible="{Binding HasAttachments}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="m:AIChatAttachment">

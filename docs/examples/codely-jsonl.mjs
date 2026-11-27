@@ -1,6 +1,7 @@
 // Optional adapter for Codely. Configure node as the executable in SourceGit.
-import { spawn } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
+import { promisify } from 'node:util';
 
 const [entry, promptFile, ...options] = process.argv.slice(2);
 const emit = event => console.log(JSON.stringify(event));
@@ -9,6 +10,29 @@ if (!entry || !promptFile) {
     process.exit(2);
 }
 
+if (promptFile === '--list-skills') {
+    try {
+        const { stdout } = await promisify(execFile)(process.execPath, [entry, 'skills', 'list'], { windowsHide: true });
+        const skills = [];
+        let skill;
+        for (const line of stdout.split(/\r?\n/)) {
+            const item = /^\s*- (\S+) \[([^\]]+)\] \(([^)]+)\)\s*$/.exec(line);
+            if (item) {
+                skill = item[2] === 'enabled' ? { id: item[1], name: item[1], source: item[3] } : null;
+                if (skill) skills.push(skill);
+            } else if (skill) {
+                const description = /^\s*Description:\s*(.+)$/.exec(line);
+                if (description) skill.description = description[1];
+            }
+        }
+        await new Promise(resolve => process.stdout.write(JSON.stringify(skills) + '\n', resolve));
+        process.exit(0);
+    } catch (error) {
+        const message = error.stderr?.trim() || error.message;
+        await new Promise(resolve => process.stderr.write(message + '\n', resolve));
+        process.exit(1);
+    }
+}
 const child = spawn(process.execPath, [entry, '-p', `@${promptFile}`, '--output-format', 'stream-json', ...options], {
     stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
