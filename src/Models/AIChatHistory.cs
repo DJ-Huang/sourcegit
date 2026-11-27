@@ -22,7 +22,7 @@ namespace SourceGit.Models
         public string Description => ViewModels.DiffAnalysisSnapshot.DisplayPath(Snapshot.Path, Snapshot.OriginalPath);
     }
 
-    public sealed record AIChatTurn(string Question, string Answer, AIChatAttachment[] Context);
+    public sealed record AIChatTurn(string Question, string Answer, AIChatAttachment[] Context, string Skill = null);
 
     public sealed class AIChatThread
     {
@@ -34,6 +34,7 @@ namespace SourceGit.Models
         public DateTimeOffset LastOpened { get; set; }
         public string Draft { get; set; } = string.Empty;
         public List<AIChatAttachment> Pending { get; set; } = [];
+        public AI.ExternalCliSkill PendingSkill { get; set; }
         public List<AIChatTurn> Turns { get; set; } = [];
         public string DisplayTitle => string.IsNullOrEmpty(Title) ? App.Text("AIChat.New") : Title;
         public string DisplayDate => LastOpened.LocalDateTime.ToString("g");

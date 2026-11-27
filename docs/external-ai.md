@@ -70,6 +70,22 @@ In an external CLI profile, expand **AI Chat model and effort**. Enter supported
 
 The corresponding selectors appear under the chat composer. **CLI default** leaves the override unset, and SourceGit remembers the selection per conversation. For commit generation, use the profile's main arguments or create a dedicated profile with the desired model and effort.
 
+### Select a CLI skill
+
+Expand **AI Chat skills** in an external CLI profile. **Skill list arguments** run the profile executable in the current worktree using these arguments in place of the main chat arguments. The list command must return a UTF-8 JSON array such as `[{"id":"code-review","name":"Code review","description":"Review a Git diff","source":"workspace"}]`. The `id` is required. The adapter should return enabled skills only.
+
+In **Use skill arguments**, enter one argument per line and use `{skill}` where the selected ID should go. For the Codely adapter, use these list arguments:
+
+```text
+<absolute path to codely-jsonl.mjs>
+<absolute path to the Codely CLI JavaScript entry point>
+--list-skills
+```
+
+Enter `--skills` and `{skill}` on separate lines under **Use skill arguments**. Codely picks up the skill in the worktree. Its normal collaboration and approval options still apply.
+
+Type `/` at the start of an empty composer and type to filter. Choose a skill, then enter your question. The composer shows the selected skill and clears it when you send. A failed or stopped request restores the skill along with the draft. History shows the skill on the question that used it.
+
 ## Create a branch and commit
 
 In **Repository configuration → AI**, set the branch-name template. The default is `{type}/{slug}`. Generate a subject from the working-copy AI toolbar and review the branch name. **Create branch and commit** shows the branch, subject and staged file count before it writes to Git. If a hook rejects the commit, review the Git log and continue the commit on the new branch.

@@ -25,7 +25,12 @@ namespace SourceGit.ViewModels
         public bool CanSelectProfile => !IsBusy && (_current.Turns.Count == 0 ||
             !Profiles.Any(profile => profile.Id == _current.ProfileId));
         public bool CanSend => !IsBusy && SelectedProfile != null &&
-            (HasPending || _current.Turns.Count > 0 && !string.IsNullOrWhiteSpace(Draft));
+            (HasPending || (_current.Turns.Count > 0 || HasPendingSkill) && !string.IsNullOrWhiteSpace(Draft));
+        public bool CanChooseSkill => !IsBusy && SelectedProfile is { HasChatSkills: true };
+        public string DraftWatermark => App.Text(SelectedProfile is { HasChatSkills: true } ? "AIChat.DraftWithSkills" : "AIChat.Draft");
+        public AI.ExternalCliSkill PendingSkill => !IsSending && SelectedProfile is { HasChatSkills: true } profile && profile.Id == _current.ProfileId &&
+            _current.PendingSkill is { HasValidId: true } skill ? skill : null;
+        public bool HasPendingSkill => PendingSkill != null;
         public string Title => _current.DisplayTitle;
         public List<Models.AIChatThread> History => _threads.Where(chat => chat.DisplayTitle.Contains(Filter, StringComparison.CurrentCultureIgnoreCase))
             .OrderByDescending(static chat => chat.LastOpened).ToList();
@@ -44,9 +49,10 @@ namespace SourceGit.ViewModels
                     _current.ProfileId = value.Id;
                     _current.Model = string.Empty;
                     _current.Effort = string.Empty;
+                    _current.PendingSkill = null;
                     RefreshChatOptions();
+                    UpdatePending();
                     ScheduleSave();
-                    OnPropertyChanged(nameof(CanSend));
                 }
             }
         }
@@ -165,6 +171,7 @@ namespace SourceGit.ViewModels
             OnPropertyChanged(nameof(HasProfiles));
             OnPropertyChanged(nameof(SelectedProfile));
             RefreshChatOptions();
+            UpdatePending();
             UpdateActions();
         }
 
@@ -180,6 +187,7 @@ namespace SourceGit.ViewModels
             OnPropertyChanged(nameof(HasChatOptions));
             OnPropertyChanged(nameof(SelectedModel));
             OnPropertyChanged(nameof(SelectedEffort));
+            OnPropertyChanged(nameof(DraftWatermark));
         }
 
         private static AIChatOption[] CreateChoices(string values, string arguments, string token) =>
@@ -199,6 +207,21 @@ namespace SourceGit.ViewModels
         {
             if (!IsBusy && thread != null && _threads.Contains(thread))
                 Activate(thread, true);
+        }
+
+        internal Task<AI.ExternalCliSkill[]> ListSkillsAsync(CancellationToken cancellation) =>
+            AI.ExternalCli.ListSkillsAsync(SelectedProfile, _repo, cancellation);
+
+        internal void SetSkill(AI.ExternalCliSkill skill)
+        {
+            if (IsBusy || skill != null && (!CanChooseSkill || !skill.HasValidId))
+                return;
+
+            if (skill != null)
+                _current.ProfileId = SelectedProfile.Id;
+            _current.PendingSkill = skill;
+            UpdatePending();
+            ScheduleSave();
         }
 
         public void TogglePreview(Models.AIChatAttachment item) => Preview = Preview == item ? null : item;
@@ -285,8 +308,11 @@ namespace SourceGit.ViewModels
             var defaultQuestion = App.Text("AIChat.DefaultQuestion");
             var question = text.Length > 0 ? text : defaultQuestion;
             var attachments = Pending;
+            var skill = PendingSkill;
             var prompt = CreatePrompt(question, defaultQuestion, attachments, out var limited);
-            var outgoing = new DiffAnalysisEntry(new("question", null, question), attachments);
+            if (skill != null)
+                prompt = $"Use the CLI skill '{skill.Id}' for this request within the current permissions.\n\n{prompt}";
+            var outgoing = new DiffAnalysisEntry(new("question", null, question), attachments, skill?.Label);
             using var cancellation = new CancellationTokenSource();
             Begin(cancellation, true, "AIChat.Running");
             Preview = null;
@@ -299,17 +325,18 @@ namespace SourceGit.ViewModels
                 if (attachments.Any(static item => item.Snapshot.HasNonText))
                     AddNotice(App.Text("DiffAnalysis.NonText"));
 
-                var agent = new AI.ExternalCli(profile, model, effort);
+                var agent = new AI.ExternalCli(profile, model, effort, skill);
                 var reply = await agent.RunAsync(_repo, AI.ExternalCliTask.DiffAnalysis, prompt, cancellation.Token, QueueTrace, _current.Id);
                 cancellation.Token.ThrowIfCancellationRequested();
                 if (reply.Restarted)
                     AddNotice(App.Text("DiffAnalysis.Restarted"));
                 QueueTrace(new("answer", null, reply.Text));
-                _current.Turns.Add(new Models.AIChatTurn(question, reply.Text, attachments));
+                _current.Turns.Add(new Models.AIChatTurn(question, reply.Text, attachments, skill?.Label));
                 if (string.IsNullOrEmpty(_current.Title))
                     _current.Title = attachments.FirstOrDefault()?.Title ?? Shorten(question.ReplaceLineEndings(" "), 72);
                 _current.ProfileId = profile.Id;
                 _current.Pending.Clear();
+                _current.PendingSkill = null;
                 _current.Draft = string.Empty;
                 Preview = null;
                 Status = string.Empty;
@@ -392,7 +419,7 @@ namespace SourceGit.ViewModels
             Status = string.Empty;
             ReplaceTranscript(thread.Turns.SelectMany(static turn => new[]
             {
-                new DiffAnalysisEntry(new("question", null, turn.Question), turn.Context),
+                new DiffAnalysisEntry(new("question", null, turn.Question), turn.Context, turn.Skill),
                 new DiffAnalysisEntry(new("answer", null, turn.Answer)),
             }));
             RefreshProfiles();
@@ -423,6 +450,8 @@ namespace SourceGit.ViewModels
             OnPropertyChanged(nameof(Pending));
             OnPropertyChanged(nameof(PendingLabel));
             OnPropertyChanged(nameof(HasPending));
+            OnPropertyChanged(nameof(PendingSkill));
+            OnPropertyChanged(nameof(HasPendingSkill));
             OnPropertyChanged(nameof(CanSend));
         }
 
@@ -438,6 +467,7 @@ namespace SourceGit.ViewModels
             OnPropertyChanged(nameof(IsSending));
             OnPropertyChanged(nameof(CanSend));
             OnPropertyChanged(nameof(CanSelectProfile));
+            OnPropertyChanged(nameof(CanChooseSkill));
         }
 
         private void ScheduleSave()
@@ -451,7 +481,7 @@ namespace SourceGit.ViewModels
             _saveTimer.Stop();
             if (!_threads.Contains(_current))
             {
-                if (_current.Turns.Count == 0 && _current.Pending.Count == 0 && string.IsNullOrWhiteSpace(_current.Draft))
+                if (_current.Turns.Count == 0 && _current.Pending.Count == 0 && _current.PendingSkill == null && string.IsNullOrWhiteSpace(_current.Draft))
                     return;
                 _threads.Add(_current);
             }

@@ -21,13 +21,17 @@ namespace SourceGit.AI
     {
         internal readonly record struct Reply(string Text, bool Restarted);
 
-        public ExternalCli(ExternalCliProfile profile, string chatModel = null, string chatEffort = null)
+        public ExternalCli(ExternalCliProfile profile, string chatModel = null, string chatEffort = null, ExternalCliSkill skill = null)
         {
             _executable = profile.Executable?.Trim();
             _arguments = [
                 .. ExternalCliProfile.ReadArguments(profile.Arguments),
                 .. ExternalCliProfile.ExpandChatArguments(profile.ChatModels, profile.ChatModelArguments, ExternalCliProfile.ChatModelToken, chatModel),
                 .. ExternalCliProfile.ExpandChatArguments(profile.ChatEfforts, profile.ChatEffortArguments, ExternalCliProfile.ChatEffortToken, chatEffort),
+                .. (profile.HasChatSkills && skill is { HasValidId: true }
+                    ? ExternalCliProfile.ReadArguments(profile.ChatSkillArguments).Select(argument =>
+                        argument.Replace(ExternalCliProfile.ChatSkillToken, skill.Id, StringComparison.Ordinal)).ToArray()
+                    : Array.Empty<string>()),
             ];
             _resumeArguments = ExternalCliProfile.ReadArguments(profile.ResumeArguments);
             _usePromptFile = profile.UsePromptFile;
@@ -37,6 +41,24 @@ namespace SourceGit.AI
             _key = Hash(string.Join('\0',
                 profile.Id.ToString(), _executable, _usePromptFile.ToString(), _structured.ToString(), _additionalPrompt,
                 Hash(string.Join('\0', _arguments)), Hash(string.Join('\0', _resumeArguments))));
+        }
+
+        internal static async Task<ExternalCliSkill[]> ListSkillsAsync(ExternalCliProfile profile, string worktree, CancellationToken cancellation)
+        {
+            var start = Commands.ExternalProcess.CreateStartInfo(profile.Executable?.Trim(), worktree);
+            foreach (var argument in ExternalCliProfile.ReadArguments(profile.ChatSkillListArguments))
+                start.ArgumentList.Add(argument);
+
+            var result = await Commands.ExternalProcess.RunAsync(start, null, 256 * 1024, timeoutSeconds: null, cancellation)
+                .ConfigureAwait(false);
+            if (result.StdOut.Truncated)
+                throw new InvalidOperationException(App.Text("ExternalCLI.OutputLimit"));
+            if (result.ExitCode != 0)
+                throw new InvalidOperationException(Commands.ExternalProcess.FormatError(result));
+
+            var skills = JsonSerializer.Deserialize(result.StdOut.Text, JsonCodeGen.Default.ExternalCliSkillArray) ?? [];
+            return skills.Where(static skill => skill is { HasValidId: true })
+                .DistinctBy(static skill => skill.Id, StringComparer.Ordinal).ToArray();
         }
 
         public async Task<Reply> RunAsync(string worktree, ExternalCliTask task, string prompt, CancellationToken cancellation,
